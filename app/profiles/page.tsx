@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { getUserByEmail } from "@/lib/users";
 import clientPromise from "@/lib/mongodb";
+import { formatProfileDate } from "@/lib/format-date";
 import { FormValues } from "@/lib/survey-data";
 import AppHeader from "@/components/AppHeader";
 import ProfilesClient, { ProfileItem } from "./ProfilesClient";
@@ -40,9 +41,10 @@ function toProfileItem(doc: ProfileDoc): ProfileItem {
     email: doc.email ?? null,
     name: doc.name ?? null,
     image: doc.image ?? null,
-    createdAt: created && !Number.isNaN(created.getTime())
-      ? created.toISOString()
-      : null,
+    createdAtLabel:
+      created && !Number.isNaN(created.getTime())
+        ? formatProfileDate(created)
+        : null,
   };
 }
 

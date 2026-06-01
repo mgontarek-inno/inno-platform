@@ -15,7 +15,7 @@ export interface ProfileItem {
   email: string | null;
   name: string | null;
   image: string | null;
-  createdAt: string | null;
+  createdAtLabel: string | null;
 }
 
 interface Props {
@@ -227,11 +227,7 @@ export default function ProfilesClient({ profiles }: Props) {
                 </div>
               )}
               <div className={styles.meta}>
-                <span>
-                  {profile.createdAt
-                    ? new Date(profile.createdAt).toLocaleString()
-                    : "—"}
-                </span>
+                <span>{profile.createdAtLabel ?? "—"}</span>
               </div>
 
               {SURVEY_SECTIONS.map((section) => {
