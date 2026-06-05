@@ -224,6 +224,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
         label: "Link do LinkedIn",
         hint: "Pełny URL do profilu LinkedIn",
         type: "short_text",
+        required: true,
       },
     ],
   },
