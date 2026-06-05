@@ -16,7 +16,7 @@
 }
 
 .label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--text-1);
@@ -27,6 +27,13 @@
 .required {
   color: var(--accent-2);
   margin-left: 3px;
+}
+
+.error {
+  margin-bottom: 12px;
+  color: #c63d3d;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .typeBadge {
@@ -54,11 +61,11 @@
 .input,
 .textarea {
   width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(47, 159, 216, 0.16);
   border-radius: var(--radius-sm);
   padding: 14px 16px;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Manrope', sans-serif;
   font-size: 14px;
   color: var(--text-1);
   transition: var(--transition);
@@ -89,11 +96,11 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(47, 159, 216, 0.14);
   border-radius: var(--radius-sm);
   color: var(--text-2);
-  font-family: 'DM Mono', monospace;
+  font-family: 'Manrope', sans-serif;
   font-size: 13px;
   cursor: pointer;
   text-align: left;
@@ -107,7 +114,7 @@
 
 .option.selected {
   border-color: var(--accent);
-  background: rgba(91, 79, 255, 0.08);
+  background: rgba(47, 159, 216, 0.1);
   color: var(--text-1);
 }
 
@@ -162,9 +169,9 @@
   height: 52px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: rgba(255,255,255,0.94);
   color: var(--text-2);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -180,10 +187,10 @@
 }
 
 .scaleBtn.selected {
-  background: var(--accent);
+  background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
   border-color: var(--accent);
   color: white;
-  box-shadow: 0 0 16px var(--accent-glow);
+  box-shadow: 0 10px 20px rgba(30, 134, 196, 0.22);
 }
 
 .scaleLabels {

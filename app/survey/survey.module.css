@@ -7,8 +7,8 @@
 .sidebar {
   width: 280px;
   flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(239, 247, 252, 0.98));
+  border-right: 1px solid rgba(45, 159, 214, 0.14);
   display: flex;
   flex-direction: column;
   padding: 40px 28px;
@@ -28,11 +28,10 @@
 .logoMark {
   font-size: 22px;
   color: var(--accent);
-  filter: drop-shadow(0 0 8px var(--accent));
 }
 
 .logoText {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.08em;
@@ -90,23 +89,22 @@
 }
 
 .btnNext {
-  background: var(--accent);
+  background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
   padding: 14px 32px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 0 24px var(--accent-glow);
+  box-shadow: 0 16px 34px rgba(30, 134, 196, 0.22);
   letter-spacing: 0.02em;
 }
 
 .btnNext:hover {
-  background: #7065ff;
-  box-shadow: 0 0 40px var(--accent-glow);
+  box-shadow: 0 20px 42px rgba(30, 134, 196, 0.3);
   transform: translateY(-1px);
 }
 
@@ -118,26 +116,45 @@
 }
 
 .btnBack {
-  background: transparent;
+  background: rgba(255,255,255,0.7);
   color: var(--text-2);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(45, 159, 214, 0.18);
   border-radius: var(--radius-sm);
   padding: 14px 28px;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Manrope', sans-serif;
   font-size: 13px;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .btnBack:hover {
-  border-color: var(--text-2);
+  border-color: rgba(45, 159, 214, 0.35);
   color: var(--text-1);
 }
 
 .submitError {
   margin-top: 16px;
-  color: #ff9f9f;
+  color: #d94d4d;
   font-size: 14px;
+}
+
+.content {
+  position: relative;
+}
+
+.content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(47, 159, 216, 0.08), transparent 24%),
+    radial-gradient(circle at 18% 12%, rgba(7, 31, 51, 0.05), transparent 28%);
+  pointer-events: none;
+}
+
+.content > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Responsive ── */

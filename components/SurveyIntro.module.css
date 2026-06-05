@@ -5,7 +5,10 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 18% 28%, rgba(69, 164, 214, 0.18), transparent 18%),
+    radial-gradient(circle at 88% 18%, rgba(43, 92, 122, 0.34), transparent 22%),
+    linear-gradient(180deg, #02070d 0%, #07263d 52%, #0e5f86 100%);
 }
 
 .noise {
@@ -20,7 +23,7 @@
   position: absolute;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(91, 79, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(72, 191, 255, 0.2) 0%, transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -44,9 +47,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(91, 79, 255, 0.12);
-  border: 1px solid rgba(91, 79, 255, 0.3);
-  color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #c6ecff;
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -61,13 +64,13 @@
   font-size: 56px;
   font-weight: 800;
   line-height: 1.05;
-  color: var(--text-1);
+  color: #f7fbff;
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
 
 .accent {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  background: linear-gradient(135deg, #86d8ff 0%, #f2fbff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -75,7 +78,7 @@
 
 .sub {
   font-size: 15px;
-  color: var(--text-2);
+  color: rgba(224, 241, 251, 0.82);
   line-height: 1.7;
   margin-bottom: 40px;
 }
@@ -91,7 +94,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: var(--text-3);
+  color: rgba(224, 241, 251, 0.68);
   letter-spacing: 0.05em;
 }
 
@@ -99,28 +102,28 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
-  opacity: 0.6;
+  background: #79d5ff;
+  opacity: 0.9;
 }
 
 .cta {
-  background: var(--accent);
+  background: linear-gradient(180deg, #43b6ec 0%, #1587c6 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
   padding: 16px 40px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 40px rgba(91, 79, 255, 0.35);
+  box-shadow: 0 18px 48px rgba(20, 118, 173, 0.42);
   letter-spacing: 0.02em;
 }
 
 .cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 48px rgba(91, 79, 255, 0.5);
+  box-shadow: 0 22px 60px rgba(20, 118, 173, 0.52);
 }
 
 @media (max-width: 600px) {

@@ -6,6 +6,10 @@
   position: relative;
   overflow: hidden;
   padding: 24px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(47, 159, 216, 0.14), transparent 18%),
+    radial-gradient(circle at 80% 10%, rgba(7, 34, 58, 0.22), transparent 22%),
+    linear-gradient(180deg, #07131f 0%, #0b2c45 55%, #0f4f73 100%);
 }
 
 .noise {
@@ -21,7 +25,7 @@
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(120, 210, 255, 0.28) 0%, transparent 68%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -33,9 +37,10 @@
   max-width: 440px;
   width: 100%;
   padding: 40px 36px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: 0 28px 80px rgba(0, 16, 34, 0.35);
 }
 
 .step {
@@ -43,7 +48,7 @@
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #4fb9ec;
   margin-bottom: 16px;
 }
 
@@ -52,10 +57,11 @@
   font-weight: 800;
   margin: 0 0 12px;
   line-height: 1.15;
+  color: #07131f;
 }
 
 .sub {
-  color: var(--text-2);
+  color: #445d6e;
   margin: 0 0 24px;
   line-height: 1.6;
 }
@@ -63,7 +69,7 @@
 .steps {
   margin: 0 0 28px;
   padding-left: 20px;
-  color: var(--text-3);
+  color: #5b7487;
   font-size: 14px;
 }
 
@@ -72,7 +78,7 @@
 }
 
 .stepsActive {
-  color: var(--text-1);
+  color: #0a2236;
   font-weight: 500;
 }
 
@@ -86,22 +92,22 @@
   font-family: "Syne", sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-1);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  color: #0a2236;
+  background: linear-gradient(180deg, #ffffff 0%, #edf6fb 100%);
+  border: 1px solid rgba(47, 159, 216, 0.22);
+  border-radius: 14px;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .googleBtn:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 24px var(--accent-glow);
+  border-color: rgba(47, 159, 216, 0.5);
+  box-shadow: 0 16px 40px rgba(47, 159, 216, 0.18);
 }
 
 .note {
   margin: 20px 0 0;
   font-size: 12px;
-  color: var(--text-3);
+  color: rgba(10, 34, 54, 0.6);
   text-align: center;
 }
