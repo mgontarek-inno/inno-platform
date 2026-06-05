@@ -22,6 +22,7 @@ export default function SurveyForm({ email, name, image }: Props) {
   const [values, setValues] = useState<FormValues>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const total = SURVEY_SECTIONS.length;
 
@@ -30,6 +31,29 @@ export default function SurveyForm({ email, name, image }: Props) {
   };
 
   const handleNext = async () => {
+    // validate current section before moving forward or submitting
+    const section = SURVEY_SECTIONS[currentSection];
+    const newErrors: Record<string, string> = {};
+    for (const f of section.fields) {
+      if (!f.required) continue;
+      const v = values[f.id];
+      if (f.type === "multi_choice") {
+        if (!Array.isArray(v) || v.length === 0) newErrors[f.id] = "To pole jest wymagane";
+      } else {
+        if (!v || String(v).trim().length === 0) newErrors[f.id] = "To pole jest wymagane";
+      }
+    }
+    setFieldErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setSubmitError("Uzupełnij wszystkie pola oznaczone gwiazdką");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setSubmitError(null);
+    setFieldErrors({});
+
     if (currentSection < total - 1) {
       setCurrentSection((s) => s + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -93,18 +117,13 @@ export default function SurveyForm({ email, name, image }: Props) {
         <aside className={styles.sidebar}>
           <div className={styles.logo}>
             <span className={styles.logoMark}>◈</span>
-            <span className={styles.logoText}>Founders Program</span>
+            <span className={styles.logoText}>Program dla założycieli</span>
           </div>
           <SurveyProgress
             sections={SURVEY_SECTIONS}
             current={currentSection}
             onNavigate={(i) => i < currentSection && setCurrentSection(i)}
           />
-          <div className={styles.sidebarFooter}>
-            <p className={styles.footerNote}>
-              Krok 2 rejestracji — po wysłaniu przejdziesz do profili.
-            </p>
-          </div>
         </aside>
 
         <div className={styles.content}>
@@ -120,6 +139,7 @@ export default function SurveyForm({ email, name, image }: Props) {
             section={section}
             values={values}
             onChange={handleChange}
+            errors={fieldErrors}
           />
 
           <div className={styles.nav}>

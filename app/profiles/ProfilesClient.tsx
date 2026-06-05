@@ -30,7 +30,6 @@ function profileSearchText(values: FormValues): string {
     .toLowerCase();
 }
 
-/** Frazy rozdzielone przecinkiem; puste fragmenty są pomijane. */
 function parseSearchPhrases(query: string): string[] {
   return query
     .split(",")
@@ -51,7 +50,6 @@ function sectionHasAnswers(values: FormValues, section: SurveySection): boolean 
   });
 }
 
-/** Pola typu single_choice — opcje biorę z definicji ankiety. */
 const FILTER_FIELDS = [
   { fieldId: "program_path", label: "Ścieżka programu" },
   { fieldId: "experience_years", label: "Doświadczenie zawodowe" },
@@ -98,6 +96,12 @@ const EMPTY_FILTERS: FiltersState = {
 export default function ProfilesClient({ profiles }: Props) {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(EMPTY_FILTERS);
+  const [sending, setSending] = useState<string | null>(null);
+  const [inviteFor, setInviteFor] = useState<ProfileItem | null>(null);
+  const [startTime, setStartTime] = useState<string>("");
+  const [durationMinutes, setDurationMinutes] = useState<number>(30);
+  const [summary, setSummary] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   const hasActiveFilters = useMemo(
     () => Object.values(filters).some((v) => v !== ""),
@@ -130,24 +134,8 @@ export default function ProfilesClient({ profiles }: Props) {
 
   return (
     <>
-      <div className={styles.toolbar}>
-        <label className={styles.searchLabel} htmlFor="profile-search">
-          Search profiles
-        </label>
-        <input
-          id="profile-search"
-          type="search"
-          className={styles.searchInput}
-          placeholder="np. DeepTech, Poland — kilka fraz po przecinku"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          autoComplete="off"
-        />
-      </div>
-
       <div className={styles.filters}>
         <div className={styles.filtersHeader}>
-          <h2 className={styles.filtersTitle}>Filtry</h2>
           {hasActiveFilters && (
             <button
               type="button"
@@ -189,15 +177,22 @@ export default function ProfilesClient({ profiles }: Props) {
             );
           })}
         </div>
-        <p className={styles.searchHint}>
-          Wyświetlane: {filtered.length} z {profiles.length}. Wyszukiwarka: kilka
-          fraz po przecinku — profil musi zawierać każdą; filtry działają
-          jednocześnie (AND).
-        </p>
+      </div>
+      
+      <div className={styles.toolbar}>
+        <input
+          id="profile-search"
+          type="search"
+          className={styles.searchInput}
+          placeholder="np. DeepTech, Poland — kilka fraz po przecinku"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          autoComplete="off"
+        />
       </div>
 
       {profiles.length === 0 ? (
-        <p className={styles.empty}>No profiles yet.</p>
+        <p className={styles.empty}>Brak profili.</p>
       ) : filtered.length === 0 ? (
         <p className={styles.empty}>Brak wyników dla podanych kryteriów.</p>
       ) : (
@@ -247,20 +242,148 @@ export default function ProfilesClient({ profiles }: Props) {
                         return null;
                       }
 
+                      const rendered = Array.isArray(value)
+                        ? value.join(", ")
+                        : field.id === "linkedin" ? (
+                            <a href={String(value)} target="_blank" rel="noopener noreferrer">
+                              {String(value)}
+                            </a>
+                          ) : (
+                            String(value)
+                          );
+
                       return (
                         <div key={field.id} className={styles.row}>
                           <span className={styles.label}>{field.label}</span>
-                          <span className={styles.value}>
-                            {Array.isArray(value) ? value.join(", ") : value}
-                          </span>
+                          <span className={styles.value}>{rendered}</span>
                         </div>
                       );
                     })}
                   </section>
                 );
               })}
+              <div className={styles.actions}>
+                {profile.email ? (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.inviteButton}
+                      onClick={() => {
+                        setInviteFor(profile);
+                        // prefill summary
+                        setSummary(`Spotkanie z ${profile.name ?? profile.email}`);
+                        // default start time to one hour from now, formatted for datetime-local
+                        const d = new Date(Date.now() + 60 * 60 * 1000);
+                        const tzOffset = d.getTimezoneOffset() * 60000;
+                        const localISO = new Date(d.getTime() - tzOffset)
+                          .toISOString()
+                          .slice(0, 16);
+                        setStartTime(localISO);
+                        setDurationMinutes(30);
+                        setDescription("");
+                      }}
+                      disabled={sending === profile.id}
+                    >
+                      Wyślij zaproszenie Meet
+                    </button>
+                  </>
+                ) : (
+                  <span className={styles.noEmail}>Brak adresu e‑mail</span>
+                )}
+              </div>
             </article>
           ))}
+        </div>
+      )}
+      {inviteFor && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+          <div className={styles.modal}>
+            <h2 className={styles.modalHeader}>Wyślij zaproszenie Meet</h2>
+            <div className={styles.modalBody}>
+              <p>
+                Do: <strong>{inviteFor.name ?? inviteFor.email}</strong>
+              </p>
+              <label className={styles.fieldLabel}>
+                Data i godzina rozpoczęcia
+                <input
+                  type="datetime-local"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className={styles.fieldInput}
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                Czas trwania (minuty)
+                <input
+                  type="number"
+                  min={1}
+                  value={durationMinutes}
+                  onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                  className={styles.fieldInput}
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                Temat
+                <input
+                  type="text"
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                  className={styles.fieldInput}
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                Opis
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className={styles.fieldInput}
+                />
+              </label>
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.inviteButton}
+                onClick={async () => {
+                  if (!inviteFor?.email) return;
+                  setSending(inviteFor.id);
+                  try {
+                    const res = await fetch("/api/google/meet", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        attendeeEmail: inviteFor.email,
+                        summary,
+                        description,
+                        startTime: new Date(startTime).toISOString(),
+                        durationMinutes,
+                      }),
+                    });
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json?.error || "Unknown error");
+                    alert("Zaproszenie wysłane — odbiorca otrzyma e‑mail.");
+                    setInviteFor(null);
+                  } catch (err: any) {
+                    console.error(err);
+                    alert("Błąd przy wysyłce zaproszenia: " + (err?.message ?? err));
+                  } finally {
+                    setSending(null);
+                  }
+                }}
+                disabled={sending === inviteFor.id}
+              >
+                {sending === inviteFor.id ? "Wysyłanie..." : "Wyślij"}
+              </button>
+              <button
+                type="button"
+                className={styles.clearFilters}
+                onClick={() => setInviteFor(null)}
+                disabled={sending === inviteFor.id}
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -11,14 +11,14 @@ export default function SurveySuccess({ values }: Props) {
       <div className={styles.glow} />
       <div className={styles.container}>
         <div className={styles.icon}>✓</div>
-        <h1 className={styles.title}>Application submitted.</h1>
+        <h1 className={styles.title}>Aplikacja wysłana.</h1>
         <p className={styles.sub}>
-          We'll review your answers and reach out within 5 business days.
-          Good luck — we're rooting for you.
+          Przejrzymy Twoje odpowiedzi i skontaktujemy się w ciągu 5 dni
+          roboczych. Powodzenia — trzymamy kciuki.
         </p>
 
         <details className={styles.details}>
-          <summary className={styles.summary}>Review your answers</summary>
+          <summary className={styles.summary}>Przejrzyj odpowiedzi</summary>
           <div className={styles.answers}>
             {SURVEY_SECTIONS.map((section) => (
               <div key={section.id} className={styles.section}>

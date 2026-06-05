@@ -9,6 +9,7 @@ export interface UserDoc {
   name: string;
   image: string;
   googleId: string;
+  refreshToken?: string;
   surveyCompleted: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +20,7 @@ export async function upsertUserFromGoogle(profile: {
   name: string;
   image: string;
   googleId: string;
+  refreshToken?: string | undefined;
 }): Promise<void> {
   const client = await clientPromise;
   const db = client.db(DB_NAME);
@@ -32,6 +34,7 @@ export async function upsertUserFromGoogle(profile: {
         name: profile.name,
         image: profile.image,
         googleId: profile.googleId,
+        ...(profile.refreshToken ? { refreshToken: profile.refreshToken } : {}),
         updatedAt: now,
       },
       $setOnInsert: {
@@ -58,5 +61,14 @@ export async function markSurveyCompleted(email: string): Promise<void> {
   await db.collection(USERS_COLLECTION).updateOne(
     { email },
     { $set: { surveyCompleted: true, updatedAt: new Date() } }
+  );
+}
+
+export async function setUserRefreshToken(email: string, refreshToken: string): Promise<void> {
+  const client = await clientPromise;
+  const db = client.db(DB_NAME);
+  await db.collection(USERS_COLLECTION).updateOne(
+    { email },
+    { $set: { refreshToken, updatedAt: new Date() } }
   );
 }

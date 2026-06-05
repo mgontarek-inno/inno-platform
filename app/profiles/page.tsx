@@ -71,9 +71,6 @@ export default async function ProfilesPage() {
       />
       <main className={styles.main}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Profiles</h1>
-        <p className={styles.sub}>Submitted applications: {items.length}</p>
-
         <ProfilesClient profiles={items} />
       </div>
       </main>

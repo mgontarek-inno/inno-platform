@@ -3,8 +3,8 @@ import Providers from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Startup Program — Application",
-  description: "Recruitment survey for the startup accelerator program",
+  title: "Program startup — Aplikacja",
+  description: "Ankieta rekrutacyjna do programu akceleracyjnego dla startupów",
 };
 
 export default function RootLayout({

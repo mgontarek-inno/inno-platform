@@ -6,9 +6,10 @@ interface Props {
   section: SurveySectionType;
   values: FormValues;
   onChange: (fieldId: string, value: string | string[]) => void;
+  errors?: Record<string, string>;
 }
 
-export default function SurveySection({ section, values, onChange }: Props) {
+export default function SurveySection({ section, values, onChange, errors }: Props) {
   return (
     <div className={styles.fields}>
       {section.fields.map((field, i) => (
@@ -18,6 +19,7 @@ export default function SurveySection({ section, values, onChange }: Props) {
           value={values[field.id] ?? (field.type === "multi_choice" ? [] : "")}
           onChange={(v) => onChange(field.id, v)}
           index={i}
+          error={errors?.[field.id]}
         />
       ))}
     </div>

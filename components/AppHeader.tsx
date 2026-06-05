@@ -15,35 +15,16 @@ export default function AppHeader({ email, name, image }: Props) {
     <header className={styles.header}>
       <div className={styles.logo}>
         <span className={styles.logoMark}>◈</span>
-        <span className={styles.logoText}>Founders Program</span>
+        <span className={styles.logoText}>Program dla założycieli</span>
       </div>
-      <div className={styles.user}>
-        {image ? (
-          <Image
-            src={image}
-            alt=""
-            width={36}
-            height={36}
-            className={styles.avatar}
-            unoptimized
-          />
-        ) : (
-          <span className={styles.avatarPlaceholder} aria-hidden>
-            {(name?.[0] ?? email?.[0] ?? "?").toUpperCase()}
-          </span>
-        )}
-        <div className={styles.userMeta}>
-          {name && <span className={styles.userName}>{name}</span>}
-          {email && <span className={styles.userEmail}>{email}</span>}
-        </div>
-        <button
+      <button
           type="button"
           className={styles.signOut}
           onClick={() => signOut({ callbackUrl: "/login" })}
         >
           Wyloguj
         </button>
-      </div>
+     
     </header>
   );
 }

@@ -13,19 +13,19 @@ export default function SurveyIntro({
       <div className={styles.glow} />
       <div className={styles.container}>
         <div className={styles.badge}>
-          {stepLabel ?? "◈ Applications open"}
+          {stepLabel ?? "◈ Nabór otwarty"}
         </div>
         <h1 className={styles.headline}>
-          Build something<br />
-          <span className={styles.accent}>that matters.</span>
+          Stwórz coś<br />
+          <span className={styles.accent}>co ma znaczenie.</span>
         </h1>
         <p className={styles.sub}>
-          This application takes about 10 minutes. Answer honestly.
+          Wypełnienie ankiety zajmuje około 10 minut. Odpowiadaj szczerze.
         </p>
         <div className={styles.meta}>
           <div className={styles.metaItem}>
             <span className={styles.metaDot} />
-            5 sections
+            5 sekcji
           </div>
           <div className={styles.metaItem}>
             <span className={styles.metaDot} />

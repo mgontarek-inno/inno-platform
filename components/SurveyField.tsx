@@ -8,9 +8,10 @@ interface Props {
   value: string | string[];
   onChange: (v: string | string[]) => void;
   index: number;
+  error?: string;
 }
 
-export default function SurveyField({ field, value, onChange, index }: Props) {
+export default function SurveyField({ field, value, onChange, index, error }: Props) {
   const strVal = typeof value === "string" ? value : "";
   const arrVal = Array.isArray(value) ? value : [];
 
@@ -31,17 +32,29 @@ export default function SurveyField({ field, value, onChange, index }: Props) {
           {field.label}
           {field.required && <span className={styles.required}>*</span>}
         </label>
-        <span className={styles.typeBadge}>{field.type.replace("_", " ")}</span>
+        <span className={styles.typeBadge}>
+          {(() => {
+            const map: Record<string, string> = {
+              short_text: "Krótka odpowiedź",
+              long_text: "Długa odpowiedź",
+              single_choice: "Wybór",
+              multi_choice: "Wielokrotny wybór",
+              scale: "Skala",
+            };
+            return map[field.type] ?? field.type.replace("_", " ");
+          })()}
+        </span>
       </div>
       {field.hint && <p className={styles.hint}>{field.hint}</p>}
 
-      {/* SHORT TEXT */}
+      {error && <p className={styles.error}>{error}</p>}
+
       {field.type === "short_text" && (
         <input
           className={styles.input}
           type="text"
           value={strVal}
-          placeholder="Your answer…"
+          placeholder="Twoja odpowiedź…"
           onChange={(e) => onChange(e.target.value)}
         />
       )}
@@ -51,7 +64,7 @@ export default function SurveyField({ field, value, onChange, index }: Props) {
         <textarea
           className={styles.textarea}
           value={strVal}
-          placeholder="Your answer…"
+          placeholder="Twoja odpowiedź…"
           rows={5}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -111,8 +124,8 @@ export default function SurveyField({ field, value, onChange, index }: Props) {
             </button>
           ))}
           <div className={styles.scaleLabels}>
-            <span>{field.scaleMin ?? "Not at all"}</span>
-            <span>{field.scaleMax ?? "Absolutely"}</span>
+            <span>{field.scaleMin ?? "Wcale"}</span>
+            <span>{field.scaleMax ?? "Zdecydowanie"}</span>
           </div>
         </div>
       )}
