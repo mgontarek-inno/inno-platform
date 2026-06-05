@@ -2,17 +2,20 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FormValues,
   SURVEY_SECTIONS,
   type SurveySection,
 } from "@/lib/survey-data";
+import SurveySectionForm from "@/components/SurveySection";
 import styles from "./profiles.module.css";
 
 export interface ProfileItem {
   id: string;
   values: FormValues;
   email: string | null;
+  userId?: string | null;
   name: string | null;
   image: string | null;
   createdAtLabel: string | null;
@@ -20,6 +23,8 @@ export interface ProfileItem {
 
 interface Props {
   profiles: ProfileItem[];
+  currentEmail: string;
+  currentUserId?: string | null;
 }
 
 function profileSearchText(values: FormValues): string {
@@ -93,11 +98,43 @@ const EMPTY_FILTERS: FiltersState = {
   needs_members: "",
 };
 
-export default function ProfilesClient({ profiles }: Props) {
+function validateValues(values: FormValues): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  for (const section of SURVEY_SECTIONS) {
+    for (const field of section.fields) {
+      if (!field.required) continue;
+      const value = values[field.id];
+
+      if (field.type === "multi_choice") {
+        if (!Array.isArray(value) || value.length === 0) {
+          errors[field.id] = "To pole jest wymagane";
+        }
+        continue;
+      }
+
+      if (!value || String(value).trim().length === 0) {
+        errors[field.id] = "To pole jest wymagane";
+      }
+    }
+  }
+
+  return errors;
+}
+
+export default function ProfilesClient({ profiles, currentEmail, currentUserId }: Props) {
+  const router = useRouter();
+  const myProfile = profiles.find(
+    (p) => p.email === currentEmail || (p.userId && currentUserId && p.userId === currentUserId)
+  );
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(EMPTY_FILTERS);
   const [sending, setSending] = useState<string | null>(null);
   const [inviteFor, setInviteFor] = useState<ProfileItem | null>(null);
+  const [editingProfile, setEditingProfile] = useState<ProfileItem | null>(null);
+  const [draftValues, setDraftValues] = useState<FormValues>({});
+  const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
+  const [savingProfileId, setSavingProfileId] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<string>("");
   const [durationMinutes, setDurationMinutes] = useState<number>(30);
   const [summary, setSummary] = useState<string>("");
@@ -131,6 +168,16 @@ export default function ProfilesClient({ profiles }: Props) {
   }, [profiles, query, filters]);
 
   const clearFilters = () => setFilters(EMPTY_FILTERS);
+
+  const startEditing = (profile: ProfileItem) => {
+    setEditingProfile(profile);
+    setDraftValues(profile.values);
+    setDraftErrors({});
+  };
+
+  const handleDraftChange = (fieldId: string, value: string | string[]) => {
+    setDraftValues((prev) => ({ ...prev, [fieldId]: value }));
+  };
 
   return (
     <>
@@ -219,11 +266,53 @@ export default function ProfilesClient({ profiles }: Props) {
                       <span className={styles.authorEmail}>{profile.email}</span>
                     )}
                   </div>
+                  <div className={styles.authorAction}>
+                    {(profile.email === currentEmail || (
+                      profile.userId && currentUserId && profile.userId === currentUserId
+                    )) && (
+                      <button
+                        type="button"
+                        className={styles.editButton}
+                        onClick={() => startEditing(profile)}
+                      >
+                        Edytuj profil
+                      </button>
+                    )}
+                    {profile.email ? (
+                      <button
+                        type="button"
+                        className={styles.inviteButton}
+                        aria-label="Wyślij zaproszenie Meet"
+                        title="Wyślij zaproszenie Meet"
+                        onClick={() => {
+                          setInviteFor(profile);
+                          setSummary(`Spotkanie z ${profile.name ?? profile.email}`);
+                          const d = new Date(Date.now() + 60 * 60 * 1000);
+                          const tzOffset = d.getTimezoneOffset() * 60000;
+                          const localISO = new Date(d.getTime() - tzOffset)
+                            .toISOString()
+                            .slice(0, 16);
+                          setStartTime(localISO);
+                          setDurationMinutes(30);
+                          setDescription("");
+                        }}
+                        disabled={sending === profile.id}
+                      >
+                        <Image
+                          src="/meet-icon.svg"
+                          alt=""
+                          width={18}
+                          height={18}
+                          className={styles.inviteIcon}
+                          aria-hidden
+                        />
+                      </button>
+                    ) : (
+                      <span className={styles.noEmail}>Brak adresu e‑mail</span>
+                    )}
+                  </div>
                 </div>
               )}
-              <div className={styles.meta}>
-                <span>{profile.createdAtLabel ?? "—"}</span>
-              </div>
 
               {SURVEY_SECTIONS.map((section) => {
                 if (!sectionHasAnswers(profile.values, section)) {
@@ -262,35 +351,6 @@ export default function ProfilesClient({ profiles }: Props) {
                   </section>
                 );
               })}
-              <div className={styles.actions}>
-                {profile.email ? (
-                  <>
-                    <button
-                      type="button"
-                      className={styles.inviteButton}
-                      onClick={() => {
-                        setInviteFor(profile);
-                        // prefill summary
-                        setSummary(`Spotkanie z ${profile.name ?? profile.email}`);
-                        // default start time to one hour from now, formatted for datetime-local
-                        const d = new Date(Date.now() + 60 * 60 * 1000);
-                        const tzOffset = d.getTimezoneOffset() * 60000;
-                        const localISO = new Date(d.getTime() - tzOffset)
-                          .toISOString()
-                          .slice(0, 16);
-                        setStartTime(localISO);
-                        setDurationMinutes(30);
-                        setDescription("");
-                      }}
-                      disabled={sending === profile.id}
-                    >
-                      Wyślij zaproszenie Meet
-                    </button>
-                  </>
-                ) : (
-                  <span className={styles.noEmail}>Brak adresu e‑mail</span>
-                )}
-              </div>
             </article>
           ))}
         </div>
@@ -379,6 +439,78 @@ export default function ProfilesClient({ profiles }: Props) {
                 className={styles.clearFilters}
                 onClick={() => setInviteFor(null)}
                 disabled={sending === inviteFor.id}
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {editingProfile && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+          <div className={styles.modal}>
+            <h2 className={styles.modalHeader}>Edytuj profil</h2>
+            <div className={styles.modalBody}>
+              <p>
+                Edytujesz: <strong>{editingProfile.name ?? editingProfile.email}</strong>
+              </p>
+              <div className={styles.editSections}>
+                {SURVEY_SECTIONS.map((section) => (
+                  <div key={section.id} className={styles.editSection}>
+                    <h3 className={styles.editSectionTitle}>{section.title}</h3>
+                    <SurveySectionForm
+                      section={section}
+                      values={draftValues}
+                      onChange={handleDraftChange}
+                      errors={draftErrors}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.inviteButton}
+                onClick={async () => {
+                  if (!editingProfile) return;
+
+                  const errors = validateValues(draftValues);
+                  setDraftErrors(errors);
+                  if (Object.keys(errors).length > 0) return;
+
+                  setSavingProfileId(editingProfile.id);
+                  try {
+                    const res = await fetch("/api/profile", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        profileId: editingProfile.id,
+                        values: draftValues,
+                      }),
+                    });
+
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json?.error || "Unknown error");
+
+                    setEditingProfile(null);
+                    router.refresh();
+                  } catch (err: any) {
+                    console.error(err);
+                    alert("Błąd przy zapisie profilu: " + (err?.message ?? err));
+                  } finally {
+                    setSavingProfileId(null);
+                  }
+                }}
+                disabled={savingProfileId === editingProfile.id}
+              >
+                {savingProfileId === editingProfile.id ? "Zapisywanie..." : "Zapisz"}
+              </button>
+              <button
+                type="button"
+                className={styles.clearFilters}
+                onClick={() => setEditingProfile(null)}
+                disabled={savingProfileId === editingProfile.id}
               >
                 Anuluj
               </button>

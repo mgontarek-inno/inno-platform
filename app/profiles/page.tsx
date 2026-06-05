@@ -39,6 +39,7 @@ function toProfileItem(doc: ProfileDoc): ProfileItem {
     id: doc._id.toString(),
     values: doc.values,
     email: doc.email ?? null,
+    userId: (doc as any).userId ?? null,
     name: doc.name ?? null,
     image: doc.image ?? null,
     createdAtLabel:
@@ -71,7 +72,12 @@ export default async function ProfilesPage() {
       />
       <main className={styles.main}>
       <div className={styles.container}>
-        <ProfilesClient profiles={items} />
+        
+        <ProfilesClient
+          profiles={items}
+          currentEmail={session.user.email}
+          currentUserId={user?.googleId ?? null}
+        />
       </div>
       </main>
     </>

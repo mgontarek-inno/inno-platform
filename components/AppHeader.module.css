@@ -16,6 +16,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo:hover,
+.logo:focus {
+  text-decoration: none;
 }
 
 .logoMark {
@@ -87,6 +94,26 @@
   border-radius: 999px;
   cursor: pointer;
   transition: var(--transition);
+}
+
+.editProfile {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-1);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.editProfile:hover {
+  background: rgba(47, 159, 216, 0.06);
+  border-color: rgba(47, 159, 216, 0.18);
 }
 
 .signOut:hover {

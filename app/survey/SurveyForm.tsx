@@ -117,7 +117,7 @@ export default function SurveyForm({ email, name, image }: Props) {
         <aside className={styles.sidebar}>
           <div className={styles.logo}>
             <span className={styles.logoMark}>◈</span>
-            <span className={styles.logoText}>Program dla założycieli</span>
+            <span className={styles.logoText}>Program dla Founderów</span>
           </div>
           <SurveyProgress
             sections={SURVEY_SECTIONS}

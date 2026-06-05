@@ -168,8 +168,34 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+}
+
+.authorAction {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editButton {
+  padding: 9px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-1);
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(47, 159, 216, 0.2);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.editButton:hover {
+  background: rgba(47, 159, 216, 0.08);
+  border-color: rgba(47, 159, 216, 0.34);
 }
 
 .authorAvatar {
@@ -234,14 +260,20 @@
   margin-top: 12px;
 }
 
+
 .inviteButton {
-  padding: 8px 12px;
-  font-size: 13px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
   background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
   color: white;
   border: none;
   border-radius: 999px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(30, 134, 196, 0.16);
 }
 
 .inviteButton:disabled {
@@ -249,9 +281,34 @@
   cursor: default;
 }
 
+.saveButton {
+  border-radius: 5px;
+  height: 30px;
+  padding: 10px;
+  background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(30, 134, 196, 0.16);
+}
+
+.saveButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.inviteIcon {
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
 .noEmail {
   color: var(--text-2);
   font-size: 13px;
+  white-space: nowrap;
 }
 
 .modalOverlay {
@@ -286,6 +343,27 @@
   display: grid;
   gap: 10px;
   margin-bottom: 12px;
+  max-height: 72vh;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.editSections {
+  display: grid;
+  gap: 22px;
+}
+
+.editSection {
+  padding: 16px 16px 4px;
+  border: 1px solid rgba(47, 159, 216, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(239, 247, 252, 0.96));
+}
+
+.editSectionTitle {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: #0b1f31;
 }
 
 .fieldLabel {

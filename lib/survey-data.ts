@@ -149,7 +149,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
         id: "needs_members",
         label: "Szukasz dodatkowych członków zespołu?",
         type: "single_choice",
-        options: ["Yes", "No", "Maybe later"],
+        options: ["Tak", "Nie", "Może później"],
       },
       {
         id: "looking_for_roles",
