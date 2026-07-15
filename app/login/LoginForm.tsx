@@ -41,7 +41,7 @@ export default function LoginForm() {
         priority
       />
       <div className={styles.card}>
-        <h1 className={styles.title}>Dołącz do platfromy matchmakingowej</h1>
+        <h1 className={styles.title}>Dołącz do platformy matchmakingowej</h1>
         <ol className={styles.steps}>
           <li className={styles.stepsActive}>Połącz konto Google</li>
           <li>Wypełnij ankietę</li>
