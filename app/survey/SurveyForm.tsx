@@ -98,13 +98,12 @@ export default function SurveyForm({ email, name, image }: Props) {
 
   if (!started) {
     return (
-      <>
-        <AppHeader email={email} name={name} image={image} />
+      <div className={styles.introScreen}>
+        <AppHeader email={email} name={name} image={image} hideEditProfile />
         <SurveyIntro
-          stepLabel="Krok 2 z 2 — Ankieta"
           onStart={() => setStarted(true)}
         />
-      </>
+      </div>
     );
   }
 
@@ -112,7 +111,7 @@ export default function SurveyForm({ email, name, image }: Props) {
 
   return (
     <>
-      <AppHeader email={email} name={name} image={image} />
+      <AppHeader email={email} name={name} image={image} hideEditProfile />
       <main className={styles.main}>
         <aside className={styles.sidebar}>
           <div className={styles.logo}>

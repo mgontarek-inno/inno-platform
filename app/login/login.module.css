@@ -1,15 +1,25 @@
 .main {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
   padding: 24px;
+  gap: 28px;
   background:
-    radial-gradient(circle at 20% 20%, rgba(47, 159, 216, 0.14), transparent 18%),
-    radial-gradient(circle at 80% 10%, rgba(7, 34, 58, 0.22), transparent 22%),
-    linear-gradient(180deg, #07131f 0%, #0b2c45 55%, #0f4f73 100%);
+    linear-gradient(180deg, rgba(7, 19, 31, 0.35) 0%, rgba(11, 44, 69, 0.2) 55%, rgba(15, 79, 115, 0.2) 100%),
+    url("/landing-header.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.brandLogo {
+  position: relative;
+  width: 300px;
+  height: auto;
 }
 
 .noise {

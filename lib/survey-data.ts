@@ -131,7 +131,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
         label: "Którą ścieżkę programu wybierasz?",
         type: "single_choice",
         required: true,
-        options: ["DeepTech", "SocialImpact", "B2B SaaS"],
+        options: ["Space Path", "Life Science Lab", "Green Challenge", "Dual-use & Defence", "AI Path"],
       },
       {
         id: "has_team",

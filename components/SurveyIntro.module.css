@@ -1,14 +1,17 @@
 .wrapper {
-  min-height: 100vh;
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 28%, rgba(69, 164, 214, 0.18), transparent 18%),
-    radial-gradient(circle at 88% 18%, rgba(43, 92, 122, 0.34), transparent 22%),
-    linear-gradient(180deg, #02070d 0%, #07263d 52%, #0e5f86 100%);
+    linear-gradient(180deg, rgba(7, 19, 31, 0.55) 0%, rgba(11, 44, 69, 0.5) 55%, rgba(15, 79, 115, 0.5) 100%),
+    url("/landing-header.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .noise {

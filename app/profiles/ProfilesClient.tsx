@@ -55,6 +55,13 @@ function sectionHasAnswers(values: FormValues, section: SurveySection): boolean 
   });
 }
 
+const SUMMARY_FIELDS = [
+  { fieldId: "program_path", label: "Ścieżka programu" },
+  { fieldId: "preferred_role", label: "Preferowana rola" },
+  { fieldId: "experience_years", label: "Doświadczenie zawodowe" },
+  { fieldId: "region", label: "Region / Miasto" },
+] as const;
+
 const FILTER_FIELDS = [
   { fieldId: "program_path", label: "Ścieżka programu" },
   { fieldId: "experience_years", label: "Doświadczenie zawodowe" },
@@ -139,6 +146,19 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
   const [durationMinutes, setDurationMinutes] = useState<number>(30);
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const hasActiveFilters = useMemo(
     () => Object.values(filters).some((v) => v !== ""),
@@ -231,7 +251,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
           id="profile-search"
           type="search"
           className={styles.searchInput}
-          placeholder="np. DeepTech, Poland — kilka fraz po przecinku"
+          placeholder="Znajdź osoby po słowach kluczowych (np. AI, DeepTech, Warszawa)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoComplete="off"
@@ -244,7 +264,15 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
         <p className={styles.empty}>Brak wyników dla podanych kryteriów.</p>
       ) : (
         <div className={styles.list}>
-          {filtered.map((profile) => (
+          {filtered.map((profile) => {
+            const isExpanded = expandedIds.has(profile.id);
+            const summaryItems = SUMMARY_FIELDS.map(({ fieldId, label }) => {
+              const value = profile.values[fieldId];
+              if (!value || (Array.isArray(value) && value.length === 0)) return null;
+              return { fieldId, label, value: Array.isArray(value) ? value.join(", ") : String(value) };
+            }).filter(Boolean) as { fieldId: string; label: string; value: string }[];
+
+            return (
             <article key={profile.id} className={styles.card}>
               {(profile.email || profile.name || profile.image) && (
                 <div className={styles.author}>
@@ -262,9 +290,12 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                     {profile.name && (
                       <span className={styles.authorName}>{profile.name}</span>
                     )}
-                    {profile.email && (
-                      <span className={styles.authorEmail}>{profile.email}</span>
-                    )}
+                    {typeof profile.values.preferred_role === "string" &&
+                      profile.values.preferred_role && (
+                        <span className={styles.authorRole}>
+                          {profile.values.preferred_role}
+                        </span>
+                      )}
                   </div>
                   <div className={styles.authorAction}>
                     {(profile.email === currentEmail || (
@@ -306,6 +337,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                           className={styles.inviteIcon}
                           aria-hidden
                         />
+                        <span>Umów się na spotkanie</span>
                       </button>
                     ) : (
                       <span className={styles.noEmail}>Brak adresu e‑mail</span>
@@ -314,45 +346,67 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                 </div>
               )}
 
-              {SURVEY_SECTIONS.map((section) => {
-                if (!sectionHasAnswers(profile.values, section)) {
-                  return null;
-                }
+              {summaryItems.length > 0 && (
+                <div className={styles.summary}>
+                  {summaryItems.map((item) => (
+                    <span key={item.fieldId} className={styles.chip}>
+                      <span className={styles.chipLabel}>{item.label}</span>
+                      {item.value}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-                return (
-                  <section key={section.id} className={styles.section}>
-                    <h2 className={styles.sectionTitle}>{section.title}</h2>
-                    {section.fields.map((field) => {
-                      const value = profile.values[field.id];
-                      if (
-                        !value ||
-                        (Array.isArray(value) && value.length === 0)
-                      ) {
-                        return null;
-                      }
+              <button
+                type="button"
+                className={styles.expandButton}
+                onClick={() => toggleExpanded(profile.id)}
+                aria-expanded={isExpanded}
+              >
+                {isExpanded ? "Zwiń profil ▲" : "Pokaż pełny profil ▼"}
+              </button>
 
-                      const rendered = Array.isArray(value)
-                        ? value.join(", ")
-                        : field.id === "linkedin" ? (
-                            <a href={String(value)} target="_blank" rel="noopener noreferrer">
-                              {String(value)}
-                            </a>
-                          ) : (
-                            String(value)
-                          );
+              {isExpanded &&
+                SURVEY_SECTIONS.map((section) => {
+                  if (!sectionHasAnswers(profile.values, section)) {
+                    return null;
+                  }
 
-                      return (
-                        <div key={field.id} className={styles.row}>
-                          <span className={styles.label}>{field.label}</span>
-                          <span className={styles.value}>{rendered}</span>
-                        </div>
-                      );
-                    })}
-                  </section>
-                );
-              })}
+                  return (
+                    <section key={section.id} className={styles.section}>
+                      <h2 className={styles.sectionTitle}>{section.title}</h2>
+                      {section.fields.map((field) => {
+                        const value = profile.values[field.id];
+                        if (
+                          !value ||
+                          (Array.isArray(value) && value.length === 0)
+                        ) {
+                          return null;
+                        }
+
+                        const rendered = Array.isArray(value)
+                          ? value.join(", ")
+                          : field.id === "linkedin" ? (
+                              <a href={String(value)} target="_blank" rel="noopener noreferrer">
+                                {String(value)}
+                              </a>
+                            ) : (
+                              String(value)
+                            );
+
+                        return (
+                          <div key={field.id} className={styles.row}>
+                            <span className={styles.label}>{field.label}</span>
+                            <span className={styles.value}>{rendered}</span>
+                          </div>
+                        );
+                      })}
+                    </section>
+                  );
+                })}
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
       {inviteFor && (
@@ -403,7 +457,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
             <div className={styles.modalActions}>
               <button
                 type="button"
-                className={styles.inviteButton}
+                className={styles.saveButton}
                 onClick={async () => {
                   if (!inviteFor?.email) return;
                   setSending(inviteFor.id);
@@ -471,7 +525,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
             <div className={styles.modalActions}>
               <button
                 type="button"
-                className={styles.inviteButton}
+                className={styles.saveButton}
                 onClick={async () => {
                   if (!editingProfile) return;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import styles from "./login.module.css";
 
 function GoogleIcon() {
@@ -31,13 +32,16 @@ export default function LoginForm() {
     <main className={styles.main}>
       <div className={styles.noise} aria-hidden />
       <div className={styles.glow} />
+      <Image
+        src="/inhub-logo-white.png"
+        alt="Innovations Hub Foundation"
+        width={440}
+        height={83}
+        className={styles.brandLogo}
+        priority
+      />
       <div className={styles.card}>
-        <span className={styles.step}>Krok 1 z 2 — Rejestracja</span>
-        <h1 className={styles.title}>Dołącz do programu</h1>
-        <p className={styles.sub}>
-          Aby rozpocząć rejestrację, połącz konto Google. Z profilu pobierzemy
-          Twój adres e-mail oraz zdjęcie (avatar).
-        </p>
+        <h1 className={styles.title}>Dołącz do Platfromy matchmakingowej</h1>
         <ol className={styles.steps}>
           <li className={styles.stepsActive}>Połącz konto Google</li>
           <li>Wypełnij ankietę aplikacyjną</li>
@@ -50,9 +54,6 @@ export default function LoginForm() {
           <GoogleIcon />
           Kontynuuj z Google
         </button>
-        <p className={styles.note}>
-          Dostęp do platformy jest możliwy wyłącznie po zalogowaniu.
-        </p>
       </div>
     </main>
   );

@@ -159,15 +159,23 @@
   border: 1px solid rgba(47, 159, 216, 0.14);
   background: rgba(255,255,255,0.96);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 22px 24px 6px;
   box-shadow: 0 12px 32px rgba(15, 23, 32, 0.04);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: rgba(47, 159, 216, 0.28);
+  box-shadow: 0 16px 40px rgba(15, 23, 32, 0.07);
 }
 
 .author {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
 }
 
 .authorAction {
@@ -175,12 +183,13 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .editButton {
-  padding: 9px 14px;
+  padding: 10px 16px;
   font-size: 13px;
   font-family: inherit;
   font-weight: 600;
@@ -207,15 +216,21 @@
 .authorMeta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
 .authorName {
   font-family: "Syne", sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-1);
+}
+
+.authorRole {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .authorEmail {
@@ -230,30 +245,93 @@
   margin-bottom: 18px;
 }
 
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 7px 13px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.chip:first-child {
+  color: #0b5a83;
+  font-weight: 700;
+  background: rgba(47, 159, 216, 0.14);
+  border-color: rgba(47, 159, 216, 0.32);
+}
+
+.chipLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+
+.expandButton {
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.expandButton:hover {
+  color: #0b5a83;
+  background: rgba(47, 159, 216, 0.05);
+}
+
 .section {
   margin-top: 18px;
   padding-top: 18px;
+  padding-bottom: 18px;
   border-top: 1px solid var(--border);
 }
 
 .sectionTitle {
   margin: 0 0 12px;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0b1f31;
 }
 
 .row {
   display: grid;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: 14px;
 }
 
 .label {
-  color: var(--text-2);
-  font-size: 12px;
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .value {
   white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .actions {
@@ -262,9 +340,11 @@
 
 
 .inviteButton {
-  width: 42px;
-  height: 42px;
-  padding: 0;
+  padding: 10px 18px 10px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  white-space: nowrap;
   background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
   color: white;
   border: none;
@@ -272,8 +352,14 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   box-shadow: 0 10px 24px rgba(30, 134, 196, 0.16);
+  transition: var(--transition);
+}
+
+.inviteButton:hover:not(:disabled) {
+  box-shadow: 0 12px 28px rgba(30, 134, 196, 0.24);
+  transform: translateY(-1px);
 }
 
 .inviteButton:disabled {
@@ -282,9 +368,11 @@
 }
 
 .saveButton {
-  border-radius: 5px;
-  height: 30px;
-  padding: 10px;
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
   background: linear-gradient(180deg, #44b8ed 0%, #1e86c4 100%);
   color: white;
   border: none;
@@ -293,11 +381,18 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 24px rgba(30, 134, 196, 0.16);
+  transition: var(--transition);
+}
+
+.saveButton:hover:not(:disabled) {
+  box-shadow: 0 12px 28px rgba(30, 134, 196, 0.24);
+  transform: translateY(-1px);
 }
 
 .saveButton:disabled {
   opacity: 0.7;
   cursor: default;
+  transform: none;
 }
 
 .inviteIcon {
