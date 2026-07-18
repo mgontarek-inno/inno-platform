@@ -156,7 +156,7 @@ export default function SurveyForm({ email, name, image }: Props) {
               {currentSection === total - 1
                 ? isSubmitting
                   ? "Zapisywanie..."
-                  : "Wyślij aplikację"
+                  : "Wyślij"
                 : "Dalej →"}
             </button>
           </div>
