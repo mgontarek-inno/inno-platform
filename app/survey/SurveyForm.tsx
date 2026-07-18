@@ -19,7 +19,7 @@ export default function SurveyForm({ email, name, image }: Props) {
   const router = useRouter();
   const [started, setStarted] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
-  const [values, setValues] = useState<FormValues>({});
+  const [values, setValues] = useState<FormValues>({ country: "Polska" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

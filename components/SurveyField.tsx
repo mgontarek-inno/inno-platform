@@ -32,18 +32,6 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
           {field.label}
           {field.required && <span className={styles.required}>*</span>}
         </label>
-        <span className={styles.typeBadge}>
-          {(() => {
-            const map: Record<string, string> = {
-              short_text: "Krótka odpowiedź",
-              long_text: "Długa odpowiedź",
-              single_choice: "Wybór",
-              multi_choice: "Wielokrotny wybór",
-              scale: "Skala",
-            };
-            return map[field.type] ?? field.type.replace("_", " ");
-          })()}
-        </span>
       </div>
       {field.hint && <p className={styles.hint}>{field.hint}</p>}
 
