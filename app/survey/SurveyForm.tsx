@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SURVEY_SECTIONS, FormValues } from "@/lib/survey-data";
 import SurveySection from "@/components/SurveySection";
@@ -23,8 +23,13 @@ export default function SurveyForm({ email, name, image }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const total = SURVEY_SECTIONS.length;
+
+  const scrollContentToTop = () => {
+    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleChange = (fieldId: string, value: string | string[]) => {
     setValues((prev) => ({ ...prev, [fieldId]: value }));
@@ -47,7 +52,7 @@ export default function SurveyForm({ email, name, image }: Props) {
 
     if (Object.keys(newErrors).length > 0) {
       setSubmitError("Uzupełnij wszystkie pola oznaczone gwiazdką");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollContentToTop();
       return;
     }
 
@@ -56,7 +61,7 @@ export default function SurveyForm({ email, name, image }: Props) {
 
     if (currentSection < total - 1) {
       setCurrentSection((s) => s + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollContentToTop();
     } else {
       try {
         setIsSubmitting(true);
@@ -92,7 +97,7 @@ export default function SurveyForm({ email, name, image }: Props) {
   const handleBack = () => {
     if (currentSection > 0) {
       setCurrentSection((s) => s - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollContentToTop();
     }
   };
 
@@ -121,7 +126,7 @@ export default function SurveyForm({ email, name, image }: Props) {
           />
         </aside>
 
-        <div className={styles.content}>
+        <div className={styles.content} ref={contentRef}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIndex}>
               {String(currentSection + 1).padStart(2, "0")} /{" "}

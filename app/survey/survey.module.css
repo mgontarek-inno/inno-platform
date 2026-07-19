@@ -1,6 +1,6 @@
 .main {
   display: flex;
-  min-height: 100vh;
+  height: calc(100vh - 72px);
 }
 
 .introScreen {
@@ -53,6 +53,8 @@
 /* ── Content ── */
 .content {
   flex: 1;
+  height: 100%;
+  overflow-y: auto;
   padding: 64px 72px;
   max-width: 760px;
 }
