@@ -73,6 +73,20 @@ const FILTER_FIELDS = [
   { fieldId: "needs_members", label: "Szuka osób do zespołu" },
 ] as const;
 
+const PROFILE_VIEW_LABELS: Record<string, string> = {
+  industry: "Branża zawodowa",
+  has_idea: "Pomysł na startup",
+  program_path: "Ścieżka programu",
+  has_team: "Status zespołu",
+  needs_members: "Szuka dodatkowych członków zespołu",
+  looking_for_roles: "Szukane role w zespole",
+  startup_experience: "Doświadczenie startupowe",
+  strengths: "Mocne strony",
+  interests: "Zainteresowania",
+  personality: "Osobowość / styl pracy",
+  preferred_role: "Preferowana rola",
+};
+
 function getFieldOptions(fieldId: string): string[] {
   for (const section of SURVEY_SECTIONS) {
     const field = section.fields.find((f) => f.id === fieldId);
@@ -136,16 +150,11 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
   );
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(EMPTY_FILTERS);
-  const [sending, setSending] = useState<string | null>(null);
-  const [inviteFor, setInviteFor] = useState<ProfileItem | null>(null);
+  const [contactFor, setContactFor] = useState<ProfileItem | null>(null);
   const [editingProfile, setEditingProfile] = useState<ProfileItem | null>(null);
   const [draftValues, setDraftValues] = useState<FormValues>({});
   const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
   const [savingProfileId, setSavingProfileId] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<string>("");
-  const [durationMinutes, setDurationMinutes] = useState<number>(30);
-  const [summary, setSummary] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (id: string) => {
@@ -313,31 +322,11 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                       <button
                         type="button"
                         className={styles.inviteButton}
-                        aria-label="Wyślij zaproszenie Meet"
-                        title="Wyślij zaproszenie Meet"
-                        onClick={() => {
-                          setInviteFor(profile);
-                          setSummary(`Spotkanie z ${profile.name ?? profile.email}`);
-                          const d = new Date(Date.now() + 60 * 60 * 1000);
-                          const tzOffset = d.getTimezoneOffset() * 60000;
-                          const localISO = new Date(d.getTime() - tzOffset)
-                            .toISOString()
-                            .slice(0, 16);
-                          setStartTime(localISO);
-                          setDurationMinutes(30);
-                          setDescription("");
-                        }}
-                        disabled={sending === profile.id}
+                        aria-label="Pokaż dane kontaktowe"
+                        title="Pokaż dane kontaktowe"
+                        onClick={() => setContactFor(profile)}
                       >
-                        <Image
-                          src="/meet-icon.svg"
-                          alt=""
-                          width={18}
-                          height={18}
-                          className={styles.inviteIcon}
-                          aria-hidden
-                        />
-                        <span>Umów się na spotkanie</span>
+                        <span>Dane kontaktowe</span>
                       </button>
                     ) : (
                       <span className={styles.noEmail}>Brak adresu e‑mail</span>
@@ -396,7 +385,9 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
 
                         return (
                           <div key={field.id} className={styles.row}>
-                            <span className={styles.label}>{field.label}</span>
+                            <span className={styles.label}>
+                              {PROFILE_VIEW_LABELS[field.id] ?? field.label}
+                            </span>
                             <span className={styles.value}>{rendered}</span>
                           </div>
                         );
@@ -409,92 +400,44 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
           })}
         </div>
       )}
-      {inviteFor && (
+      {contactFor && (
         <div className={styles.modalOverlay} role="dialog" aria-modal="true">
           <div className={styles.modal}>
-            <h2 className={styles.modalHeader}>Wyślij zaproszenie Meet</h2>
+            <h2 className={styles.modalHeader}>Dane kontaktowe</h2>
             <div className={styles.modalBody}>
               <p>
-                Do: <strong>{inviteFor.name ?? inviteFor.email}</strong>
+                <strong>{contactFor.name ?? contactFor.email}</strong>
               </p>
-              <label className={styles.fieldLabel}>
-                Data i godzina rozpoczęcia
-                <input
-                  type="datetime-local"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className={styles.fieldInput}
-                />
-              </label>
-              <label className={styles.fieldLabel}>
-                Czas trwania (minuty)
-                <input
-                  type="number"
-                  min={1}
-                  value={durationMinutes}
-                  onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                  className={styles.fieldInput}
-                />
-              </label>
-              <label className={styles.fieldLabel}>
-                Temat
-                <input
-                  type="text"
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value)}
-                  className={styles.fieldInput}
-                />
-              </label>
-              <label className={styles.fieldLabel}>
-                Opis
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className={styles.fieldInput}
-                />
-              </label>
+              {contactFor.email && (
+                <label className={styles.fieldLabel}>
+                  E‑mail
+                  <a href={`mailto:${contactFor.email}`} className={styles.fieldInput}>
+                    {contactFor.email}
+                  </a>
+                </label>
+              )}
+              {typeof contactFor.values.linkedin === "string" &&
+                contactFor.values.linkedin && (
+                  <label className={styles.fieldLabel}>
+                    LinkedIn
+                    <a
+                      href={contactFor.values.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.fieldInput}
+                    >
+                      {contactFor.values.linkedin}
+                    </a>
+                  </label>
+                )}
             </div>
             <div className={styles.modalActions}>
               <button
                 type="button"
-                className={styles.saveButton}
-                onClick={async () => {
-                  if (!inviteFor?.email) return;
-                  setSending(inviteFor.id);
-                  try {
-                    const res = await fetch("/api/google/meet", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        attendeeEmail: inviteFor.email,
-                        summary,
-                        description,
-                        startTime: new Date(startTime).toISOString(),
-                        durationMinutes,
-                      }),
-                    });
-                    const json = await res.json();
-                    if (!res.ok) throw new Error(json?.error || "Unknown error");
-                    alert("Zaproszenie wysłane — odbiorca otrzyma e‑mail.");
-                    setInviteFor(null);
-                  } catch (err: any) {
-                    console.error(err);
-                    alert("Błąd przy wysyłce zaproszenia: " + (err?.message ?? err));
-                  } finally {
-                    setSending(null);
-                  }
-                }}
-                disabled={sending === inviteFor.id}
-              >
-                {sending === inviteFor.id ? "Wysyłanie..." : "Wyślij"}
-              </button>
-              <button
-                type="button"
                 className={styles.clearFilters}
-                onClick={() => setInviteFor(null)}
-                disabled={sending === inviteFor.id}
+                onClick={() => setContactFor(null)}
               >
-                Anuluj
+                Zamknij
               </button>
             </div>
           </div>
