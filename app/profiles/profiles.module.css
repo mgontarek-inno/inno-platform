@@ -487,3 +487,53 @@ a.fieldInput {
   gap: 8px;
   justify-content: flex-end;
 }
+
+.dangerZone {
+  margin-top: 40px;
+  padding: 20px 24px;
+  border: 1px solid rgba(217, 77, 77, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(217, 77, 77, 0.04);
+}
+
+.dangerZoneTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #d94d4d;
+  margin-bottom: 8px;
+}
+
+.dangerZoneText {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 16px;
+}
+
+.dangerZoneError {
+  font-size: 13px;
+  color: #d94d4d;
+  margin-bottom: 12px;
+}
+
+.dangerButton {
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  background: transparent;
+  color: #d94d4d;
+  border: 1px solid rgba(217, 77, 77, 0.4);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dangerButton:hover {
+  background: rgba(217, 77, 77, 0.1);
+  border-color: #d94d4d;
+}
+
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

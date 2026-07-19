@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  min-height: 72px;
   padding: 16px 28px;
   border-bottom: 1px solid rgba(45, 159, 214, 0.18);
   background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(246, 250, 253, 0.96));

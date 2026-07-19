@@ -7,6 +7,7 @@ import SurveySection from "@/components/SurveySection";
 import SurveyProgress from "@/components/SurveyProgress";
 import SurveyIntro from "@/components/SurveyIntro";
 import AppHeader from "@/components/AppHeader";
+import Image from "next/image";
 import styles from "./survey.module.css";
 
 interface Props {
@@ -115,8 +116,13 @@ export default function SurveyForm({ email, name, image }: Props) {
       <main className={styles.main}>
         <aside className={styles.sidebar}>
           <div className={styles.logo}>
-            <span className={styles.logoMark}>◈</span>
-            <span className={styles.logoText}>Program dla Founderów</span>
+            <Image
+              src="/dark_logo.png"
+              alt="Innovations Hub Foundation"
+              width={180}
+              height={34}
+              className={styles.logoImage}
+            />
           </div>
           <SurveyProgress
             sections={SURVEY_SECTIONS}

@@ -20,8 +20,8 @@
   flex-direction: column;
   padding: 40px 28px;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: 72px;
+  height: calc(100vh - 72px);
   overflow: hidden;
 }
 
@@ -32,18 +32,10 @@
   margin-bottom: 48px;
 }
 
-.logoMark {
-  font-size: 22px;
-  color: var(--accent);
-}
-
-.logoText {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-2);
+.logoImage {
+  width: 180px;
+  height: auto;
+  display: block;
 }
 
 .sidebarFooter {

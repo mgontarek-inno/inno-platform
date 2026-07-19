@@ -72,3 +72,9 @@ export async function setUserRefreshToken(email: string, refreshToken: string): 
     { $set: { refreshToken, updatedAt: new Date() } }
   );
 }
+
+export async function deleteUserByEmail(email: string): Promise<void> {
+  const client = await clientPromise;
+  const db = client.db(DB_NAME);
+  await db.collection(USERS_COLLECTION).deleteOne({ email });
+}

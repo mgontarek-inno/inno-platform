@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { ProfileItem } from "@/app/profiles/ProfilesClient";
 import { SURVEY_SECTIONS, FormValues } from "@/lib/survey-data";
 import SurveySectionForm from "@/components/SurveySection";
@@ -12,6 +13,26 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
   const [draftValues, setDraftValues] = useState<FormValues>(profile.values);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const CONFIRM_WORD = "DELETE";
+  const canDeleteAccount = deleteConfirmText.trim().toUpperCase() === CONFIRM_WORD;
+
+  const handleDeleteAccount = async () => {
+    if (!canDeleteAccount) return;
+    setDeleteError(null);
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/account", { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      await signOut({ callbackUrl: "/login" });
+    } catch (err) {
+      setDeleteError("Błąd przy usuwaniu konta");
+      setDeleting(false);
+    }
+  };
 
   const handleChange = (fieldId: string, value: string | string[]) => {
     setDraftValues((p) => ({ ...p, [fieldId]: value }));
@@ -71,6 +92,33 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
         >
           {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
         </button>
+      </div>
+
+      <div className={styles.dangerZone}>
+        <h3 className={styles.dangerZoneTitle}>Strefa zagrożenia</h3>
+        <p className={styles.dangerZoneText}>
+          Usunięcie konta jest nieodwracalne i skasuje Twój profil oraz wszystkie dane. Aby
+          potwierdzić, wpisz <strong>{CONFIRM_WORD}</strong> poniżej.
+        </p>
+        <input
+          type="text"
+          className={styles.fieldInput}
+          value={deleteConfirmText}
+          onChange={(e) => setDeleteConfirmText(e.target.value)}
+          placeholder={CONFIRM_WORD}
+          style={{ marginBottom: 12, maxWidth: 240 }}
+        />
+        {deleteError && <p className={styles.dangerZoneError}>{deleteError}</p>}
+        <div>
+          <button
+            type="button"
+            className={styles.dangerButton}
+            onClick={handleDeleteAccount}
+            disabled={deleting || !canDeleteAccount}
+          >
+            {deleting ? 'Usuwanie...' : 'Usuń konto'}
+          </button>
+        </div>
       </div>
     </div>
   );

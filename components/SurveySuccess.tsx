@@ -14,7 +14,7 @@ export default function SurveySuccess({ values }: Props) {
         <h1 className={styles.title}>Aplikacja wysłana.</h1>
         <p className={styles.sub}>
           Przejrzymy Twoje odpowiedzi i skontaktujemy się w ciągu 5 dni
-          roboczych. Powodzenia — trzymamy kciuki.
+          roboczych. Powodzenia, trzymamy kciuki.
         </p>
 
         <details className={styles.details}>
