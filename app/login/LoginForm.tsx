@@ -42,9 +42,14 @@ export default function LoginForm() {
       />
       <div className={styles.card}>
         <h1 className={styles.title}>Dołącz do platformy matchmakingowej</h1>
+        <p className={styles.sub}>
+          Platforma matchmakingowa dla uczestników programu akceleracyjnego
+          Innovations Hub Foundation.
+        </p>
         <ol className={styles.steps}>
           <li className={styles.stepsActive}>Połącz konto Google</li>
           <li>Wypełnij ankietę</li>
+          <li>Znajdź co-foundera</li>
         </ol>
         <button
           type="button"
