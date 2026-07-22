@@ -43,7 +43,8 @@ export default function LoginForm() {
       <div className={styles.card}>
         <h1 className={styles.title}>Dołącz do platformy matchmakingowej</h1>
         <p className={styles.sub}>
-          Platforma umożliwia uczestnikom programu inkubacyjnego utworzenie profilu, wypełnienie ankiety oraz dopasowanie do zespołów projektowych na podstawie kompetencji i zainteresowań.
+      Platforma matchmakingowa dla uczestników programu akceleracyjnego
+          Innovations Hub Foundation.
         </p>
         <ol className={styles.steps}>
           <li className={styles.stepsActive}>Połącz konto Google</li>
