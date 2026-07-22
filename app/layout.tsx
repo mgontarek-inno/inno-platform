@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Innovations Hub Foundation - platforma",
-  description: "Ankieta rekrutacyjna do programu akceleracyjnego dla startupów",
+  description: "Platforma matchmakingowa Innovations Hub Foundation umożliwia uczestnikom programu inkubacyjnego utworzenie profilu, wypełnienie ankiety dotyczącej kompetencji i zainteresowań oraz znalezienie współzałożycieli i członków zespołów do realizacji projektów startupowych. Logowanie przez Google służy do bezpiecznej identyfikacji użytkownika i dostępu do platformy.",
 };
 
 export default function RootLayout({
