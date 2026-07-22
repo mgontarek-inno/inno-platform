@@ -121,3 +121,12 @@
   color: rgba(10, 34, 54, 0.6);
   text-align: center;
 }
+
+.noteLink {
+  color: #2f9fd8;
+  text-decoration: none;
+}
+
+.noteLink:hover {
+  text-decoration: underline;
+}

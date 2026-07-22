@@ -59,6 +59,18 @@ export default function LoginForm() {
           <GoogleIcon />
           Kontynuuj z Google
         </button>
+        <p className={styles.note}>
+          Logując się, akceptujesz{" "}
+          <a
+            href="https://www.innovationshub.pl/rodo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.noteLink}
+          >
+            Politykę prywatności
+          </a>
+          .
+        </p>
       </div>
     </main>
   );
