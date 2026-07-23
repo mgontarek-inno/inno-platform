@@ -73,6 +73,8 @@ const FILTER_FIELDS = [
   { fieldId: "needs_members", label: "Szuka osób do zespołu" },
 ] as const;
 
+const LINK_FIELD_IDS = ["linkedin", "githuba", "researchGate"];
+
 const PROFILE_VIEW_LABELS: Record<string, string> = {
   industry: "Branża zawodowa",
   has_idea: "Pomysł na startup",
@@ -102,6 +104,7 @@ function matchesFieldFilter(
 ): boolean {
   if (!selected) return true;
   const v = values[fieldId];
+  if (Array.isArray(v)) return v.includes(selected);
   if (typeof v !== "string") return false;
   return v === selected;
 }
@@ -156,6 +159,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
   const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
   const [savingProfileId, setSavingProfileId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [avatarErrors, setAvatarErrors] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
@@ -287,12 +291,20 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                 <div className={styles.author}>
                   {profile.image && (
                     <Image
-                      src={profile.image}
+                      src={avatarErrors.has(profile.id) ? "/default-avatar.svg" : profile.image}
                       alt=""
                       width={40}
                       height={40}
                       className={styles.authorAvatar}
                       unoptimized
+                      onError={() =>
+                        setAvatarErrors((prev) => {
+                          if (prev.has(profile.id)) return prev;
+                          const next = new Set(prev);
+                          next.add(profile.id);
+                          return next;
+                        })
+                      }
                     />
                   )}
                   <div className={styles.authorMeta}>
@@ -375,7 +387,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
 
                         const rendered = Array.isArray(value)
                           ? value.join(", ")
-                          : field.id === "linkedin" ? (
+                          : LINK_FIELD_IDS.includes(field.id) ? (
                               <a href={String(value)} target="_blank" rel="noopener noreferrer">
                                 {String(value)}
                               </a>
@@ -427,6 +439,34 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                       className={styles.fieldInput}
                     >
                       {contactFor.values.linkedin}
+                    </a>
+                  </label>
+                )}
+              {typeof contactFor.values.githuba === "string" &&
+                contactFor.values.githuba && (
+                  <label className={styles.fieldLabel}>
+                    GitHub
+                    <a
+                      href={contactFor.values.githuba}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.fieldInput}
+                    >
+                      {contactFor.values.githuba}
+                    </a>
+                  </label>
+                )}
+              {typeof contactFor.values.researchGate === "string" &&
+                contactFor.values.researchGate && (
+                  <label className={styles.fieldLabel}>
+                    ResearchGate
+                    <a
+                      href={contactFor.values.researchGate}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.fieldInput}
+                    >
+                      {contactFor.values.researchGate}
                     </a>
                   </label>
                 )}

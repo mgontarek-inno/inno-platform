@@ -43,7 +43,7 @@ export default function LoginForm() {
       <div className={styles.card}>
         <h1 className={styles.title}>Dołącz do platformy matchmakingowej</h1>
         <p className={styles.sub}>
-      Platforma matchmakingowa dla uczestników programu akceleracyjnego
+      Platforma matchmakingowa dla uczestników programu inkubacyjnego
           Innovations Hub Foundation.
         </p>
         <ol className={styles.steps}>

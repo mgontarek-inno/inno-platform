@@ -95,7 +95,7 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 14px 32px;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Raleway', sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -122,7 +122,7 @@
   border: 1px solid rgba(45, 159, 214, 0.18);
   border-radius: var(--radius-sm);
   padding: 14px 28px;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Raleway', sans-serif;
   font-size: 13px;
   cursor: pointer;
   transition: var(--transition);
