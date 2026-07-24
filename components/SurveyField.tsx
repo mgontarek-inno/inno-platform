@@ -3,17 +3,38 @@
 import { SurveyField as FieldType } from "@/lib/survey-data";
 import styles from "./SurveyField.module.css";
 
+const OTHER_OPTION = "Inne";
+
 interface Props {
   field: FieldType;
   value: string | string[];
   onChange: (v: string | string[]) => void;
+  otherValue?: string | string[];
+  onOtherChange?: (v: string) => void;
   index: number;
   error?: string;
 }
 
-export default function SurveyField({ field, value, onChange, index, error }: Props) {
+export default function SurveyField({
+  field,
+  value,
+  onChange,
+  otherValue,
+  onOtherChange,
+  index,
+  error,
+}: Props) {
   const strVal = typeof value === "string" ? value : "";
   const arrVal = Array.isArray(value) ? value : [];
+  const otherStrVal = typeof otherValue === "string" ? otherValue : "";
+
+  const showOtherInput =
+    field.options?.includes(OTHER_OPTION) &&
+    (field.type === "single_choice"
+      ? strVal === OTHER_OPTION
+      : field.type === "multi_choice"
+      ? arrVal.includes(OTHER_OPTION)
+      : false);
 
   const toggleMulti = (option: string) => {
     const next = arrVal.includes(option)
@@ -134,6 +155,19 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
         </div>
       )}
 
+      {field.type === "single_choice" && showOtherInput && (
+        <input
+          className={styles.input}
+          style={{ marginTop: 8 }}
+          type="text"
+          value={otherStrVal}
+          placeholder="Doprecyzuj…"
+          onChange={(e) => onOtherChange?.(e.target.value)}
+          onKeyDown={handleEnterKey}
+          data-survey-focusable
+        />
+      )}
+
       {/* MULTI CHOICE */}
       {field.type === "multi_choice" && (
         <div className={styles.options}>
@@ -155,6 +189,19 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
             </button>
           ))}
         </div>
+      )}
+
+      {field.type === "multi_choice" && showOtherInput && (
+        <input
+          className={styles.input}
+          style={{ marginTop: 8 }}
+          type="text"
+          value={otherStrVal}
+          placeholder="Doprecyzuj…"
+          onChange={(e) => onOtherChange?.(e.target.value)}
+          onKeyDown={handleEnterKey}
+          data-survey-focusable
+        />
       )}
 
       {/* SCALE */}

@@ -75,6 +75,12 @@ const FILTER_FIELDS = [
 
 const LINK_FIELD_IDS = ["linkedin", "githuba", "researchGate"];
 
+const OTHER_OPTION = "Inne";
+
+function formatOptionValue(v: string, otherText?: string): string {
+  return v === OTHER_OPTION && otherText ? `\n${OTHER_OPTION}: \n${otherText}` : v;
+}
+
 const PROFILE_VIEW_LABELS: Record<string, string> = {
   industry: "Branża zawodowa",
   has_idea: "Pomysł na startup",
@@ -392,14 +398,18 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                           return null;
                         }
 
+                        const otherText = profile.values[`${field.id}_other`];
+                        const otherTextStr =
+                          typeof otherText === "string" ? otherText : undefined;
+
                         const rendered = Array.isArray(value)
-                          ? value.join(", ")
+                          ? value.map((v) => formatOptionValue(v, otherTextStr)).join(", ")
                           : LINK_FIELD_IDS.includes(field.id) ? (
                               <a href={String(value)} target="_blank" rel="noopener noreferrer">
                                 {String(value)}
                               </a>
                             ) : (
-                              String(value)
+                              formatOptionValue(String(value), otherTextStr)
                             );
 
                         return (

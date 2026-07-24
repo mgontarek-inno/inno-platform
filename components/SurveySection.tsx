@@ -18,6 +18,8 @@ export default function SurveySection({ section, values, onChange, errors }: Pro
           field={field}
           value={values[field.id] ?? (field.type === "multi_choice" ? [] : "")}
           onChange={(v) => onChange(field.id, v)}
+          otherValue={values[`${field.id}_other`]}
+          onOtherChange={(v) => onChange(`${field.id}_other`, v)}
           index={i}
           error={errors?.[field.id]}
         />
