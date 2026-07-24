@@ -139,6 +139,8 @@ function validateValues(values: FormValues): Record<string, string> {
 
       if (!value || String(value).trim().length === 0) {
         errors[field.id] = "To pole jest wymagane";
+      } else if (field.numeric && !/^\d+$/.test(String(value).trim())) {
+        errors[field.id] = "Podaj poprawną liczbę";
       }
     }
   }

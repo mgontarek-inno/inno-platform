@@ -12,6 +12,7 @@ export interface SurveyField {
   type: FieldType;
   options?: string[];
   required?: boolean;
+  numeric?: boolean;
   scaleMin?: string;
   scaleMax?: string;
   conditionalOn?: { field: string; value: string };
@@ -28,7 +29,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
     id: "personal",
     title: "Informacje osobiste",
     fields: [
-      { id: "age", label: "Wiek", type: "short_text", required: true },
+      { id: "age", label: "Wiek", type: "short_text", required: true, numeric: true },
       {
         id: "country",
         label: "Kraj zamieszkania",

@@ -37,7 +37,19 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
 
       {error && <p className={styles.error}>{error}</p>}
 
-      {field.type === "short_text" && (
+      {field.type === "short_text" && field.numeric && (
+        <input
+          className={styles.input}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          value={strVal}
+          placeholder="Twoja odpowiedź…"
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+
+      {field.type === "short_text" && !field.numeric && (
         <input
           className={styles.input}
           type="text"

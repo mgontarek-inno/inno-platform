@@ -44,8 +44,10 @@ export default function SurveyForm({ email, name, image }: Props) {
       const v = values[f.id];
       if (f.type === "multi_choice") {
         if (!Array.isArray(v) || v.length === 0) newErrors[f.id] = "To pole jest wymagane";
-      } else {
-        if (!v || String(v).trim().length === 0) newErrors[f.id] = "To pole jest wymagane";
+      } else if (!v || String(v).trim().length === 0) {
+        newErrors[f.id] = "To pole jest wymagane";
+      } else if (f.numeric && !/^\d+$/.test(String(v).trim())) {
+        newErrors[f.id] = "Podaj poprawną liczbę";
       }
     }
     setFieldErrors(newErrors);

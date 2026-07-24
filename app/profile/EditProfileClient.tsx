@@ -46,8 +46,10 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
         const v = values[field.id];
         if (field.type === "multi_choice") {
           if (!Array.isArray(v) || v.length === 0) errs[field.id] = "To pole jest wymagane";
-        } else {
-          if (!v || String(v).trim().length === 0) errs[field.id] = "To pole jest wymagane";
+        } else if (!v || String(v).trim().length === 0) {
+          errs[field.id] = "To pole jest wymagane";
+        } else if (field.numeric && !/^\d+$/.test(String(v).trim())) {
+          errs[field.id] = "Podaj poprawną liczbę";
         }
       }
     }
