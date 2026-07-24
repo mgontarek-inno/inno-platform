@@ -67,7 +67,15 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
         ))}
       </div>
 
-      <div style={{ marginTop: 12 }}>
+      <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+        <button
+          type="button"
+          className={styles.clearFilters}
+          onClick={() => router.push("/profiles")}
+          disabled={saving}
+        >
+          Wróć
+        </button>
         <button
           type="button"
           className={styles.saveButton}

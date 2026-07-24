@@ -11,7 +11,7 @@ interface Props {
 
 export default function SurveySection({ section, values, onChange, errors }: Props) {
   return (
-    <div className={styles.fields}>
+    <div className={styles.fields} data-survey-fields>
       {section.fields.map((field, i) => (
         <SurveyField
           key={field.id}

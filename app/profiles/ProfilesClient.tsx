@@ -313,12 +313,17 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                     {profile.name && (
                       <span className={styles.authorName}>{profile.name}</span>
                     )}
-                    {typeof profile.values.preferred_role === "string" &&
-                      profile.values.preferred_role && (
-                        <span className={styles.authorRole}>
-                          {profile.values.preferred_role}
-                        </span>
-                      )}
+                    {(() => {
+                      const role = profile.values.preferred_role;
+                      const roleLabel = Array.isArray(role)
+                        ? role.join(", ")
+                        : role;
+                      return (
+                        roleLabel && (
+                          <span className={styles.authorRole}>{roleLabel}</span>
+                        )
+                      );
+                    })()}
                   </div>
                   <div className={styles.authorAction}>
                     {(profile.email === currentEmail || (

@@ -155,6 +155,7 @@ export default function SurveyForm({ email, name, image }: Props) {
               className={styles.btnNext}
               onClick={handleNext}
               disabled={isSubmitting}
+              data-survey-next-btn
             >
               {currentSection === total - 1
                 ? isSubmitting

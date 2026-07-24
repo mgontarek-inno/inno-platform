@@ -205,14 +205,15 @@ export const SURVEY_SECTIONS: SurveySection[] = [
       {
         id: "preferred_role",
         label: "W jakiej roli czujesz się najlepiej?",
-        type: "single_choice",
+        type: "multi_choice",
         options: [
-          "CEO / Visioner",
-          "CTO / Lider techniczny",
-          "CPO / Lider produktu",
-          "CMO / Growth",
-          "COO / Organizacja i zarządzanie",
-          "Ekspert domenowy / Specjalista",
+          "CEO (Lider porjektu / Wizjoner)",
+          "CTO (Lider techniczny / Inżynier)",
+          "CSO (Lider sprzedaży)",
+          "CMO (Marketing / Growth)",
+          "COO (Operacje)",
+          "CFO (Finanse)",
+          "Ekspert (Specjalista w brażny)",
         ],
       },
       {

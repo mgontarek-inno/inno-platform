@@ -22,6 +22,46 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
     onChange(next);
   };
 
+  const focusNextField = (current: HTMLElement) => {
+    const container = current.closest<HTMLElement>("[data-survey-fields]");
+    if (!container) return;
+    const focusables = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-survey-focusable]")
+    );
+    const currentIndex = focusables.indexOf(current);
+    const next = focusables[currentIndex + 1];
+    if (next) {
+      next.focus();
+    } else {
+      document
+        .querySelector<HTMLButtonElement>("[data-survey-next-btn]")
+        ?.click();
+    }
+  };
+
+  const handleEnterKey = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    focusNextField(e.currentTarget);
+  };
+
+  const handleOptionArrowKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) {
+      return;
+    }
+    e.preventDefault();
+    const group = e.currentTarget.parentElement;
+    if (!group) return;
+    const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>("button"));
+    const currentIndex = buttons.indexOf(e.currentTarget);
+    if (currentIndex === -1) return;
+    const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+    const nextIndex = (currentIndex + dir + buttons.length) % buttons.length;
+    buttons[nextIndex]?.focus();
+  };
+
   return (
     <div
       className={styles.field}
@@ -46,6 +86,8 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
           value={strVal}
           placeholder="Twoja odpowiedź…"
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleEnterKey}
+          data-survey-focusable
         />
       )}
 
@@ -56,6 +98,8 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
           value={strVal}
           placeholder="Twoja odpowiedź…"
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleEnterKey}
+          data-survey-focusable
         />
       )}
 
@@ -67,18 +111,21 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
           placeholder="Twoja odpowiedź…"
           rows={5}
           onChange={(e) => onChange(e.target.value)}
+          data-survey-focusable
         />
       )}
 
       {/* SINGLE CHOICE */}
       {field.type === "single_choice" && (
         <div className={styles.options}>
-          {field.options?.map((opt) => (
+          {field.options?.map((opt, i) => (
             <button
               key={opt}
               className={`${styles.option} ${strVal === opt ? styles.selected : ""}`}
               onClick={() => onChange(opt)}
+              onKeyDown={handleOptionArrowKey}
               type="button"
+              {...(i === 0 ? { "data-survey-focusable": true } : {})}
             >
               <span className={styles.optionDot} />
               {opt}
@@ -90,14 +137,16 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
       {/* MULTI CHOICE */}
       {field.type === "multi_choice" && (
         <div className={styles.options}>
-          {field.options?.map((opt) => (
+          {field.options?.map((opt, i) => (
             <button
               key={opt}
               className={`${styles.option} ${styles.multiOption} ${
                 arrVal.includes(opt) ? styles.selected : ""
               }`}
               onClick={() => toggleMulti(opt)}
+              onKeyDown={handleOptionArrowKey}
               type="button"
+              {...(i === 0 ? { "data-survey-focusable": true } : {})}
             >
               <span className={styles.optionCheckbox}>
                 {arrVal.includes(opt) && "✓"}
@@ -118,7 +167,9 @@ export default function SurveyField({ field, value, onChange, index, error }: Pr
                 strVal === String(n) ? styles.selected : ""
               }`}
               onClick={() => onChange(String(n))}
+              onKeyDown={handleOptionArrowKey}
               type="button"
+              {...(n === 1 ? { "data-survey-focusable": true } : {})}
             >
               {n}
             </button>
