@@ -51,6 +51,7 @@
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 28px 80px rgba(0, 16, 34, 0.35);
+  overflow: visible;
 }
 
 .step {
@@ -63,11 +64,15 @@
 }
 
 .title {
-  font-size: 32px;
+  font-size: clamp(20px, 6vw, 32px);
   font-weight: 800;
   margin: 0 0 12px;
-  line-height: 1.15;
+  line-height: 1.05;
   color: #07131f;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 .sub {
@@ -129,4 +134,16 @@
 
 .noteLink:hover {
   text-decoration: underline;
+}
+
+/* responsive adjustments */
+@media (max-width: 480px) {
+  .card {
+    padding: 24px 16px;
+    max-width: 100%;
+  }
+  .title {
+    font-size: clamp(18px, 5.5vw, 24px);
+    line-height: 1.05;
+  }
 }
