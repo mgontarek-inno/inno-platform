@@ -11,12 +11,12 @@
     "mongodb": "^7.2.0",
     "next": "^16.2.7",
     "next-auth": "^4.24.14",
-    "react": "^18",
+    "react": "^19",
     "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "@types/react-dom": "^18",
     "typescript": "^5"
   }
