@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getUserByEmail } from "@/lib/users";
+import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
 import AppHeader from "@/components/AppHeader";
 import EditProfileClient from "@/app/profile/EditProfileClient";
@@ -9,7 +9,7 @@ import { FormValues } from "@/lib/survey-data";
 import { formatProfileDate } from "@/lib/format-date";
 import styles from "@/app/profiles/profiles.module.css";
 
-const DB_NAME = process.env.MONGODB_DB ?? "startup-survey";
+const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
 
 interface ProfileDoc {
@@ -28,6 +28,7 @@ function toProfileItem(doc: ProfileDoc) {
     id: doc._id.toString(),
     values: doc.values,
     email: doc.email ?? null,
+    hasEmail: Boolean(doc.email),
     userId: doc.userId ?? null,
     name: doc.name ?? null,
     image: doc.image ?? null,
@@ -42,12 +43,20 @@ export default async function EditProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  const user = await getUserByEmail(session.user.email);
+  if (session.user.status !== "approved") {
+    redirect("/pending");
+  }
+
   const client = await clientPromise;
   const db = client.db(DB_NAME);
 
+  const orConditions: Record<string, unknown>[] = [{ email: session.user.email }];
+  if (session.user.googleId) {
+    orConditions.push({ userId: session.user.googleId });
+  }
+
   const doc = await db.collection<ProfileDoc>(COLLECTION_NAME).findOne({
-    $or: [{ email: session.user.email }, { userId: user?.googleId }],
+    $or: orConditions,
   });
 
   if (!doc) {
@@ -58,11 +67,16 @@ export default async function EditProfilePage() {
 
   return (
     <>
-      <AppHeader email={session.user.email} name={session.user.name} image={session.user.image} />
+      <AppHeader
+        email={session.user.email}
+        name={session.user.name}
+        image={session.user.image}
+        isAdmin={session.user.role === "admin"}
+      />
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>Edytuj mój profil</h1>
-          <EditProfileClient profile={profile} />
+          <EditProfileClient profile={profile} emailVisible={session.user.emailVisible ?? true} />
         </div>
       </main>
     </>

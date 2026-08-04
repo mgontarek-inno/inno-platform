@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getUserByEmail } from "@/lib/users";
 import SurveyForm from "./SurveyForm";
 
 export default async function SurveyPage() {
@@ -11,8 +10,11 @@ export default async function SurveyPage() {
     redirect("/login");
   }
 
-  const user = await getUserByEmail(session.user.email);
-  if (user?.surveyCompleted) {
+  if (session.user.status !== "approved") {
+    redirect("/pending");
+  }
+
+  if (session.user.surveyCompleted) {
     redirect("/profiles");
   }
 

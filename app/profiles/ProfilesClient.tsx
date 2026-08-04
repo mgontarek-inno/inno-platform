@@ -3,11 +3,14 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FormValues, SURVEY_SECTIONS } from "@/lib/survey-data";
+import { LINK_FIELD_IDS, safeExternalUrl } from "@/lib/url-safety";
 import {
-  FormValues,
-  SURVEY_SECTIONS,
-  type SurveySection,
-} from "@/lib/survey-data";
+  OTHER_OPTION,
+  PROFILE_VIEW_LABELS,
+  formatOptionValue,
+  sectionHasAnswers,
+} from "@/lib/survey-view";
 import SurveySectionForm from "@/components/SurveySection";
 import styles from "./profiles.module.css";
 
@@ -15,6 +18,7 @@ export interface ProfileItem {
   id: string;
   values: FormValues;
   email: string | null;
+  hasEmail: boolean;
   userId?: string | null;
   name: string | null;
   image: string | null;
@@ -42,19 +46,6 @@ function parseSearchPhrases(query: string): string[] {
     .filter((s) => s.length > 0);
 }
 
-function sectionHasAnswers(values: FormValues, section: SurveySection): boolean {
-  const fields = section.fields;
-
-  if (!fields?.length) return false;
-
-  return fields.some((field) => {
-    const v = values[field.id];
-    if (v === undefined || v === null) return false;
-    if (Array.isArray(v)) return v.length > 0;
-    return String(v).trim().length > 0;
-  });
-}
-
 const SUMMARY_FIELDS = [
   { fieldId: "program_path", label: "Ścieżka programu" },
   { fieldId: "preferred_role", label: "Preferowana rola" },
@@ -72,28 +63,6 @@ const FILTER_FIELDS = [
   { fieldId: "startup_experience", label: "Doświadczenie startupowe" },
   { fieldId: "needs_members", label: "Szuka osób do zespołu" },
 ] as const;
-
-const LINK_FIELD_IDS = ["linkedin", "githuba", "researchGate"];
-
-const OTHER_OPTION = "Inne";
-
-function formatOptionValue(v: string, otherText?: string): string {
-  return v === OTHER_OPTION && otherText ? `\n${OTHER_OPTION}: \n${otherText}` : v;
-}
-
-const PROFILE_VIEW_LABELS: Record<string, string> = {
-  industry: "Branża zawodowa",
-  has_idea: "Pomysł na startup",
-  program_path: "Ścieżka programu",
-  has_team: "Status zespołu",
-  needs_members: "Szuka dodatkowych członków zespołu",
-  looking_for_roles: "Szukane role w zespole",
-  startup_experience: "Doświadczenie startupowe",
-  strengths: "Mocne strony",
-  interests: "Zainteresowania",
-  personality: "Osobowość / styl pracy",
-  preferred_role: "Preferowana rola",
-};
 
 function getFieldOptions(fieldId: string): string[] {
   for (const section of SURVEY_SECTIONS) {
@@ -162,6 +131,9 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(EMPTY_FILTERS);
   const [contactFor, setContactFor] = useState<ProfileItem | null>(null);
+  const [contactEmail, setContactEmail] = useState<string | null>(null);
+  const [contactHidden, setContactHidden] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
   const [editingProfile, setEditingProfile] = useState<ProfileItem | null>(null);
   const [draftValues, setDraftValues] = useState<FormValues>({});
   const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
@@ -209,6 +181,25 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
   }, [profiles, query, filters]);
 
   const clearFilters = () => setFilters(EMPTY_FILTERS);
+
+  const openContact = async (profile: ProfileItem) => {
+    setContactFor(profile);
+    setContactEmail(null);
+    setContactHidden(false);
+    setContactLoading(true);
+    try {
+      const res = await fetch(`/api/profile/contact?profileId=${encodeURIComponent(profile.id)}`);
+      const json = await res.json();
+      if (res.ok) {
+        setContactEmail(json.email ?? null);
+        setContactHidden(Boolean(json.hidden));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setContactLoading(false);
+    }
+  };
 
   const startEditing = (profile: ProfileItem) => {
     setEditingProfile(profile);
@@ -343,13 +334,13 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                         Edytuj profil
                       </button>
                     )}
-                    {profile.email ? (
+                    {profile.hasEmail ? (
                       <button
                         type="button"
                         className={styles.inviteButton}
                         aria-label="Pokaż dane kontaktowe"
                         title="Pokaż dane kontaktowe"
-                        onClick={() => setContactFor(profile)}
+                        onClick={() => openContact(profile)}
                       >
                         <span>Dane kontaktowe</span>
                       </button>
@@ -402,12 +393,18 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                         const otherTextStr =
                           typeof otherText === "string" ? otherText : undefined;
 
+                        const safeHref = LINK_FIELD_IDS.includes(field.id)
+                          ? safeExternalUrl(value)
+                          : null;
+
                         const rendered = Array.isArray(value)
                           ? value.map((v) => formatOptionValue(v, otherTextStr)).join(", ")
-                          : LINK_FIELD_IDS.includes(field.id) ? (
-                              <a href={String(value)} target="_blank" rel="noopener noreferrer">
-                                {String(value)}
+                          : safeHref ? (
+                              <a href={safeHref} target="_blank" rel="noopener noreferrer">
+                                {safeHref}
                               </a>
+                            ) : LINK_FIELD_IDS.includes(field.id) ? (
+                              String(value)
                             ) : (
                               formatOptionValue(String(value), otherTextStr)
                             );
@@ -435,58 +432,46 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
             <h2 className={styles.modalHeader}>Dane kontaktowe</h2>
             <div className={styles.modalBody}>
               <p>
-                <strong>{contactFor.name ?? contactFor.email}</strong>
+                <strong>{contactFor.name ?? "Uczestnik"}</strong>
               </p>
-              {contactFor.email && (
+              {contactLoading ? (
+                <p>Ładowanie danych kontaktowych...</p>
+              ) : contactHidden ? (
+                <p>Ten uczestnik ukrył swój adres e‑mail.</p>
+              ) : contactEmail ? (
                 <label className={styles.fieldLabel}>
                   E‑mail
-                  <a href={`mailto:${contactFor.email}`} className={styles.fieldInput}>
-                    {contactFor.email}
+                  <a href={`mailto:${contactEmail}`} className={styles.fieldInput}>
+                    {contactEmail}
                   </a>
                 </label>
+              ) : (
+                <p>Brak adresu e‑mail.</p>
               )}
-              {typeof contactFor.values.linkedin === "string" &&
-                contactFor.values.linkedin && (
-                  <label className={styles.fieldLabel}>
-                    LinkedIn
+              {LINK_FIELD_IDS.map((fieldId) => {
+                const raw = contactFor.values[fieldId];
+                const safeHref = safeExternalUrl(raw);
+                if (!safeHref) return null;
+                const label =
+                  fieldId === "linkedin"
+                    ? "LinkedIn"
+                    : fieldId === "githuba"
+                    ? "GitHub"
+                    : "ResearchGate";
+                return (
+                  <label key={fieldId} className={styles.fieldLabel}>
+                    {label}
                     <a
-                      href={contactFor.values.linkedin}
+                      href={safeHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.fieldInput}
                     >
-                      {contactFor.values.linkedin}
+                      {safeHref}
                     </a>
                   </label>
-                )}
-              {typeof contactFor.values.githuba === "string" &&
-                contactFor.values.githuba && (
-                  <label className={styles.fieldLabel}>
-                    GitHub
-                    <a
-                      href={contactFor.values.githuba}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.fieldInput}
-                    >
-                      {contactFor.values.githuba}
-                    </a>
-                  </label>
-                )}
-              {typeof contactFor.values.researchGate === "string" &&
-                contactFor.values.researchGate && (
-                  <label className={styles.fieldLabel}>
-                    ResearchGate
-                    <a
-                      href={contactFor.values.researchGate}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.fieldInput}
-                    >
-                      {contactFor.values.researchGate}
-                    </a>
-                  </label>
-                )}
+                );
+              })}
             </div>
             <div className={styles.modalActions}>
               <button

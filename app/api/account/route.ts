@@ -1,11 +1,37 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
+import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
-import { getUserByEmail, deleteUserByEmail } from "@/lib/users";
+import { getUserByEmail, deleteUserByEmail, setEmailVisible } from "@/lib/users";
 
-const DB_NAME = process.env.MONGODB_DB ?? "startup-survey";
+const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
+
+interface AccountPatchPayload {
+  emailVisible?: boolean;
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = (await request.json()) as AccountPatchPayload;
+    if (typeof body.emailVisible !== "boolean") {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+
+    await setEmailVisible(session.user.email, body.emailVisible);
+
+    return NextResponse.json({ ok: true }, { status: 200 });
+  } catch (error) {
+    console.error("Account update failed:", error);
+    return NextResponse.json({ error: "Failed to update account" }, { status: 500 });
+  }
+}
 
 export async function DELETE() {
   try {

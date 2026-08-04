@@ -8,7 +8,12 @@ import { SURVEY_SECTIONS, FormValues } from "@/lib/survey-data";
 import SurveySectionForm from "@/components/SurveySection";
 import styles from "@/app/profiles/profiles.module.css";
 
-export default function EditProfileClient({ profile }: { profile: ProfileItem }) {
+interface Props {
+  profile: ProfileItem;
+  emailVisible: boolean;
+}
+
+export default function EditProfileClient({ profile, emailVisible }: Props) {
   const router = useRouter();
   const [draftValues, setDraftValues] = useState<FormValues>(profile.values);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -16,6 +21,29 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [hideEmail, setHideEmail] = useState(!emailVisible);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
+  const [visibilityError, setVisibilityError] = useState<string | null>(null);
+
+  const handleHideEmailChange = async (checked: boolean) => {
+    setHideEmail(checked);
+    setVisibilityError(null);
+    setVisibilitySaving(true);
+    try {
+      const res = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailVisible: !checked }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      router.refresh();
+    } catch (err) {
+      setHideEmail(!checked);
+      setVisibilityError("Błąd przy zapisie widoczności e-maila");
+    } finally {
+      setVisibilitySaving(false);
+    }
+  };
 
   const CONFIRM_WORD = "DELETE";
   const canDeleteAccount = deleteConfirmText.trim().toUpperCase() === CONFIRM_WORD;
@@ -103,6 +131,22 @@ export default function EditProfileClient({ profile }: { profile: ProfileItem })
           {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
         </button>
       </div>
+
+      <div className={styles.privacyRow}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            className={styles.checkboxInput}
+            checked={hideEmail}
+            disabled={visibilitySaving}
+            onChange={(e) => handleHideEmailChange(e.target.checked)}
+          />
+          <span className={styles.checkboxBox} aria-hidden="true" />
+          Ukryj mój e‑mail dla innych uczestników
+        </label>
+        {visibilitySaving && <span className={styles.savingHint}>Zapisywanie...</span>}
+      </div>
+      {visibilityError && <p className={styles.dangerZoneError}>{visibilityError}</p>}
 
       <div className={styles.dangerZone}>
         <h3 className={styles.dangerZoneTitle}>Strefa zagrożenia</h3>

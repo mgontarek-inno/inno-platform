@@ -2,12 +2,14 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { authOptions } from "@/lib/auth";
+import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
-import { getUserByEmail } from "@/lib/users";
+import { sanitizeSurveyValues } from "@/lib/survey-validation";
 import { FormValues } from "@/lib/survey-data";
 
-const DB_NAME = process.env.MONGODB_DB ?? "startup-survey";
+const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
+const MAX_BODY_LENGTH = 200_000;
 
 interface UpdateProfilePayload {
   profileId?: string;
@@ -21,8 +23,22 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await request.json()) as UpdateProfilePayload;
-    if (!body.profileId || !body.values || typeof body.values !== "object") {
+    if (session.user.status !== "approved") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const rawBody = await request.text();
+    if (rawBody.length > MAX_BODY_LENGTH) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
+    const body = JSON.parse(rawBody) as UpdateProfilePayload;
+    if (!body.profileId || !ObjectId.isValid(body.profileId)) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+
+    const values = sanitizeSurveyValues(body.values);
+    if (Object.keys(values).length === 0) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
@@ -31,11 +47,10 @@ export async function PATCH(request: Request) {
 
     // allow updating when the current session email matches the profile email
     // or when the current user's googleId matches profile.userId
-    const currentUser = await getUserByEmail(session.user.email);
     const ownerMatch = {
       $or: [
         { email: session.user.email },
-        { userId: currentUser?.googleId ?? session.user.email },
+        ...(session.user.googleId ? [{ userId: session.user.googleId }] : []),
       ],
     };
 
@@ -46,7 +61,7 @@ export async function PATCH(request: Request) {
       },
       {
         $set: {
-          values: body.values,
+          values,
           updatedAt: new Date(),
         },
       }

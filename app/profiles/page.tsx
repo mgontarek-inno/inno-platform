@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getUserByEmail } from "@/lib/users";
+import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
 import { formatProfileDate } from "@/lib/format-date";
 import { FormValues } from "@/lib/survey-data";
@@ -9,7 +9,7 @@ import AppHeader from "@/components/AppHeader";
 import ProfilesClient, { ProfileItem } from "./ProfilesClient";
 import styles from "./profiles.module.css";
 
-const DB_NAME = process.env.MONGODB_DB ?? "startup-survey";
+const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
 
 interface ProfileDoc {
@@ -32,13 +32,15 @@ async function getProfiles(): Promise<ProfileDoc[]> {
     .toArray();
 }
 
-function toProfileItem(doc: ProfileDoc): ProfileItem {
+function toProfileItem(doc: ProfileDoc, viewerEmail: string): ProfileItem {
   const created =
     doc.createdAt != null ? new Date(doc.createdAt) : null;
+  const isOwnProfile = doc.email === viewerEmail;
   return {
     id: doc._id.toString(),
     values: doc.values,
-    email: doc.email ?? null,
+    email: isOwnProfile ? doc.email ?? null : null,
+    hasEmail: Boolean(doc.email),
     userId: (doc as any).userId ?? null,
     name: doc.name ?? null,
     image: doc.image ?? null,
@@ -55,13 +57,16 @@ export default async function ProfilesPage() {
     redirect("/login");
   }
 
-  const user = await getUserByEmail(session.user.email);
-  if (!user?.surveyCompleted) {
+  if (session.user.status !== "approved") {
+    redirect("/pending");
+  }
+
+  if (!session.user.surveyCompleted) {
     redirect("/survey");
   }
 
   const profiles = await getProfiles();
-  const items = profiles.map(toProfileItem);
+  const items = profiles.map((doc) => toProfileItem(doc, session.user.email as string));
 
   return (
     <>
@@ -69,14 +74,15 @@ export default async function ProfilesPage() {
         email={session.user.email}
         name={session.user.name}
         image={session.user.image}
+        isAdmin={session.user.role === "admin"}
       />
       <main className={styles.main}>
       <div className={styles.container}>
-        
+
         <ProfilesClient
           profiles={items}
           currentEmail={session.user.email}
-          currentUserId={user?.googleId ?? null}
+          currentUserId={session.user.googleId ?? null}
         />
       </div>
       </main>

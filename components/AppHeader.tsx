@@ -10,9 +10,10 @@ interface Props {
   name?: string | null;
   image?: string | null;
   hideEditProfile?: boolean;
+  isAdmin?: boolean;
 }
 
-export default function AppHeader({ email, name, image, hideEditProfile }: Props) {
+export default function AppHeader({ email, name, image, hideEditProfile, isAdmin }: Props) {
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.logo}>
@@ -26,6 +27,11 @@ export default function AppHeader({ email, name, image, hideEditProfile }: Props
         />
       </Link>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        {isAdmin && (
+          <Link href="/admin" className={styles.editProfile}>
+            Panel administratora
+          </Link>
+        )}
         {!hideEditProfile && (
           <Link href="/profile/edit" className={styles.editProfile}>
             Edytuj profil

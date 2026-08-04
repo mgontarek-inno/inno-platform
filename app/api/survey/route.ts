@@ -1,12 +1,15 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
+import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
 import { FormValues } from "@/lib/survey-data";
+import { sanitizeSurveyValues } from "@/lib/survey-validation";
 import { getUserByEmail, markSurveyCompleted } from "@/lib/users";
 
-const DB_NAME = process.env.MONGODB_DB ?? "startup-survey";
+const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
+const MAX_BODY_LENGTH = 200_000;
 
 interface SurveyPayload {
   values?: FormValues;
@@ -20,6 +23,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (session.user.status !== "approved") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const email = session.user.email;
     const existingUser = await getUserByEmail(email);
 
@@ -30,9 +37,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as SurveyPayload;
+    const rawBody = await request.text();
+    if (rawBody.length > MAX_BODY_LENGTH) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
 
-    if (!body.values || typeof body.values !== "object") {
+    const body = JSON.parse(rawBody) as SurveyPayload;
+    const values = sanitizeSurveyValues(body.values);
+
+    if (Object.keys(values).length === 0) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
@@ -44,7 +57,7 @@ export async function POST(request: Request) {
       email,
       name: session.user.name ?? "",
       image: session.user.image ?? "",
-      values: body.values,
+      values,
       createdAt: new Date(),
     });
 
