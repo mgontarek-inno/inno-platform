@@ -24,6 +24,17 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return new URL(url, baseUrl).toString();
+      }
+
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+
+      return `${baseUrl}/pending`;
+    },
     async jwt({ token, user }) {
       if (user?.email) {
         token.email = user.email;
@@ -56,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         session.user.status = dbUser.status ?? "pending";
         session.user.role = dbUser.role ?? "user";
         session.user.emailVisible = dbUser.emailVisible ?? true;
+        session.user.profileVisible = dbUser.profileVisible ?? true;
         session.user.googleId = dbUser.googleId;
         session.user.surveyCompleted = Boolean(dbUser.surveyCompleted);
       } catch (error) {

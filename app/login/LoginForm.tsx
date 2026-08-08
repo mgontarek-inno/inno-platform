@@ -54,7 +54,7 @@ export default function LoginForm() {
         <button
           type="button"
           className={styles.googleBtn}
-          onClick={() => signIn("google", { callbackUrl: "/survey" })}
+          onClick={() => signIn("google", { callbackUrl: "/pending" })}
         >
           <GoogleIcon />
           Kontynuuj z Google

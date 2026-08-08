@@ -16,6 +16,7 @@ export interface UserDoc {
   status?: UserStatus;
   role?: UserRole;
   emailVisible?: boolean;
+  profileVisible?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +47,7 @@ export async function upsertUserFromGoogle(profile: {
         status: admin ? "approved" : "pending",
         role: admin ? "admin" : "user",
         emailVisible: true,
+        profileVisible: true,
         createdAt: now,
       },
     },
@@ -126,5 +128,17 @@ export async function setEmailVisible(
   await db.collection(USERS_COLLECTION).updateOne(
     { email },
     { $set: { emailVisible: visible, updatedAt: new Date() } }
+  );
+}
+
+export async function setProfileVisible(
+  email: string,
+  visible: boolean
+): Promise<void> {
+  const client = await clientPromise;
+  const db = client.db(getDbName());
+  await db.collection(USERS_COLLECTION).updateOne(
+    { email },
+    { $set: { profileVisible: visible, updatedAt: new Date() } }
   );
 }

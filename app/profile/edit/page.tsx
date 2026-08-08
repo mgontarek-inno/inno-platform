@@ -76,7 +76,12 @@ export default async function EditProfilePage() {
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>Edytuj mój profil</h1>
-          <EditProfileClient profile={profile} emailVisible={session.user.emailVisible ?? true} />
+          <EditProfileClient
+            profile={profile}
+            emailVisible={session.user.emailVisible ?? true}
+            profileVisible={session.user.profileVisible ?? true}
+            isAdmin={session.user.role === "admin"}
+          />
         </div>
       </main>
     </>

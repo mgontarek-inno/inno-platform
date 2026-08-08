@@ -9,6 +9,7 @@ declare module "next-auth" {
       status?: "pending" | "approved";
       role?: "user" | "admin";
       emailVisible?: boolean;
+      profileVisible?: boolean;
       googleId?: string;
       surveyCompleted?: boolean;
     };

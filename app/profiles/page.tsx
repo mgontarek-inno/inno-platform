@@ -18,18 +18,37 @@ interface ProfileDoc {
   email?: string;
   name?: string;
   image?: string;
+  userId?: string;
   createdAt?: Date | string;
 }
 
-async function getProfiles(): Promise<ProfileDoc[]> {
+async function getProfiles(viewerEmail: string): Promise<ProfileDoc[]> {
   const client = await clientPromise;
   const db = client.db(DB_NAME);
 
-  return db
+  const hiddenUsers = await db
+    .collection<{ email?: string; googleId?: string }>("users")
+    .find({ profileVisible: false })
+    .project({ email: 1, googleId: 1, _id: 0 })
+    .toArray();
+
+  const hiddenEmails = new Set(hiddenUsers.map((user) => user.email).filter(Boolean));
+  const hiddenUserIds = new Set(hiddenUsers.map((user) => user.googleId).filter(Boolean));
+
+  const profiles = await db
     .collection<ProfileDoc>(COLLECTION_NAME)
     .find({})
     .sort({ createdAt: -1 })
     .toArray();
+
+  return profiles.filter((doc) => {
+    if (doc.email === viewerEmail) return true;
+
+    const isHiddenByEmail = Boolean(doc.email && hiddenEmails.has(doc.email));
+    const isHiddenByUserId = Boolean(doc.userId && hiddenUserIds.has(doc.userId));
+
+    return !(isHiddenByEmail || isHiddenByUserId);
+  });
 }
 
 function toProfileItem(doc: ProfileDoc, viewerEmail: string): ProfileItem {
@@ -65,7 +84,7 @@ export default async function ProfilesPage() {
     redirect("/survey");
   }
 
-  const profiles = await getProfiles();
+  const profiles = await getProfiles(session.user.email as string);
   const items = profiles.map((doc) => toProfileItem(doc, session.user.email as string));
 
   return (

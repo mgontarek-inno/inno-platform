@@ -11,9 +11,11 @@ import styles from "@/app/profiles/profiles.module.css";
 interface Props {
   profile: ProfileItem;
   emailVisible: boolean;
+  profileVisible: boolean;
+  isAdmin: boolean;
 }
 
-export default function EditProfileClient({ profile, emailVisible }: Props) {
+export default function EditProfileClient({ profile, emailVisible, profileVisible, isAdmin }: Props) {
   const router = useRouter();
   const [draftValues, setDraftValues] = useState<FormValues>(profile.values);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -22,6 +24,7 @@ export default function EditProfileClient({ profile, emailVisible }: Props) {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [hideEmail, setHideEmail] = useState(!emailVisible);
+  const [hideProfile, setHideProfile] = useState(!profileVisible);
   const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [visibilityError, setVisibilityError] = useState<string | null>(null);
 
@@ -40,6 +43,26 @@ export default function EditProfileClient({ profile, emailVisible }: Props) {
     } catch (err) {
       setHideEmail(!checked);
       setVisibilityError("Błąd przy zapisie widoczności e-maila");
+    } finally {
+      setVisibilitySaving(false);
+    }
+  };
+
+  const handleHideProfileChange = async (checked: boolean) => {
+    setHideProfile(checked);
+    setVisibilityError(null);
+    setVisibilitySaving(true);
+    try {
+      const res = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileVisible: !checked }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      router.refresh();
+    } catch (err) {
+      setHideProfile(!checked);
+      setVisibilityError("Błąd przy zapisie widoczności profilu");
     } finally {
       setVisibilitySaving(false);
     }
@@ -146,6 +169,21 @@ export default function EditProfileClient({ profile, emailVisible }: Props) {
         </label>
         {visibilitySaving && <span className={styles.savingHint}>Zapisywanie...</span>}
       </div>
+      {isAdmin && (
+        <div className={styles.privacyRow}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              className={styles.checkboxInput}
+              checked={hideProfile}
+              disabled={visibilitySaving}
+              onChange={(e) => handleHideProfileChange(e.target.checked)}
+            />
+            <span className={styles.checkboxBox} aria-hidden="true" />
+            Ukryj mój profil w liście profili
+          </label>
+        </div>
+      )}
       {visibilityError && <p className={styles.dangerZoneError}>{visibilityError}</p>}
 
       <div className={styles.dangerZone}>

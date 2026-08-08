@@ -3,13 +3,14 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
-import { getUserByEmail, deleteUserByEmail, setEmailVisible } from "@/lib/users";
+import { getUserByEmail, deleteUserByEmail, setEmailVisible, setProfileVisible } from "@/lib/users";
 
 const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
 
 interface AccountPatchPayload {
   emailVisible?: boolean;
+  profileVisible?: boolean;
 }
 
 export async function PATCH(request: Request) {
@@ -20,11 +21,20 @@ export async function PATCH(request: Request) {
     }
 
     const body = (await request.json()) as AccountPatchPayload;
-    if (typeof body.emailVisible !== "boolean") {
+    const hasEmailVisibility = typeof body.emailVisible === "boolean";
+    const hasProfileVisibility = typeof body.profileVisible === "boolean";
+
+    if (!hasEmailVisibility && !hasProfileVisibility) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    await setEmailVisible(session.user.email, body.emailVisible);
+    if (hasEmailVisibility) {
+      await setEmailVisible(session.user.email, body.emailVisible!);
+    }
+
+    if (hasProfileVisibility) {
+      await setProfileVisible(session.user.email, body.profileVisible!);
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
