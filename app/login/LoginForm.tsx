@@ -62,9 +62,8 @@ export default function LoginForm() {
         <p className={styles.note}>
           Logując się, akceptujesz{" "}
           <a
-            href="https://www.innovationshub.pl/rodo"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/Polityka_Prywatnosci_Platforma%20matchmakingowa%20IHF.pdf"
+            download
             className={styles.noteLink}
           >
             Politykę prywatności
