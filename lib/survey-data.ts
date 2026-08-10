@@ -128,7 +128,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
       },
       {
         id: "program_path",
-        label: "Którą ścieżkę programu deklarujesz?",
+        label: "Którą ścieżkę programu deklarujesz? (można więcej niż jedną opcję)",
         type: "multi_choice",
         required: true,
         options: ["Space Path", "Life Science Lab", "Green Challenge", "Dual-use & Defence", "AI Tech Track"],
@@ -207,13 +207,13 @@ export const SURVEY_SECTIONS: SurveySection[] = [
         label: "W jakiej roli czujesz się najlepiej?",
         type: "multi_choice",
         options: [
-          "CEO (Lider porjektu / Wizjoner)",
+          "CEO (Lider projektu / Wizjoner)",
           "CTO (Lider techniczny / Inżynier)",
           "CSO (Lider sprzedaży)",
           "CMO (Marketing / Growth)",
           "COO (Operacje)",
           "CFO (Finanse)",
-          "Ekspert (Specjalista w brażny)",
+          "Ekspert (Specjalista w branży)",
         ],
       },
       {
@@ -225,7 +225,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
             {
         id: "githuba",
         label: "Link do Githuba",
-        hint: "Pełny URL do profiluGithuba",
+        hint: "Pełny URL do profilu Githuba",
         type: "short_text",
       },
             {
