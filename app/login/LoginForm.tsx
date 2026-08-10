@@ -62,7 +62,7 @@ export default function LoginForm() {
         <p className={styles.note}>
           Logując się, akceptujesz{" "}
           <a
-            href="/Polityka_Prywatnosci_Platforma%20matchmakingowa%20IHF.pdf"
+            href="/polityka-prywatnosci.pdf"
             download
             className={styles.noteLink}
           >

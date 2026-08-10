@@ -8,6 +8,6 @@ export default withAuth({
 
 export const config = {
   matcher: [
-    "/((?!login|api/auth|_next/static|_next/image|favicon.ico|landing-header.png|inhub-logo-white.png|dark_logo.png).*)",
+    "/((?!login|api/auth|_next/static|_next/image|favicon.ico|landing-header.png|inhub-logo-white.png|dark_logo.png|polityka-prywatnosci.pdf).*)",
   ],
 };
