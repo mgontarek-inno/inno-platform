@@ -252,6 +252,27 @@
   padding: 16px 0;
 }
 
+.startupOverview {
+  padding: 16px 0 6px;
+  display: grid;
+  gap: 6px;
+}
+
+.startupName {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b1f31;
+}
+
+.startupDescription {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-2);
+  white-space: pre-wrap;
+}
+
 .chip {
   display: inline-flex;
   align-items: baseline;

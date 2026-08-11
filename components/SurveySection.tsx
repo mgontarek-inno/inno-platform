@@ -9,10 +9,29 @@ interface Props {
   errors?: Record<string, string>;
 }
 
+function isFieldVisible(field: any, values: FormValues): boolean {
+  if (!field.conditionalOn) return true;
+  
+  const fieldValue = values[field.conditionalOn.field];
+  if (!fieldValue) return false;
+  
+  if (field.conditionalOn.values) {
+    return field.conditionalOn.values.includes(String(fieldValue));
+  }
+  
+  if (field.conditionalOn.value) {
+    return String(fieldValue) === field.conditionalOn.value;
+  }
+  
+  return true;
+}
+
 export default function SurveySection({ section, values, onChange, errors }: Props) {
   return (
     <div className={styles.fields} data-survey-fields>
-      {section.fields.map((field, i) => (
+      {section.fields
+        .filter((field) => isFieldVisible(field, values))
+        .map((field, i) => (
         <SurveyField
           key={field.id}
           field={field}

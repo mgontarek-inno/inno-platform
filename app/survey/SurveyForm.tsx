@@ -31,6 +31,23 @@ export default function SurveyForm({ email, name, image }: Props) {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const isFieldVisible = (field: typeof SURVEY_SECTIONS[0]["fields"][0]): boolean => {
+    if (!field.conditionalOn) return true;
+    
+    const fieldValue = values[field.conditionalOn.field];
+    if (!fieldValue) return false;
+    
+    if (field.conditionalOn.values) {
+      return field.conditionalOn.values.includes(String(fieldValue));
+    }
+    
+    if (field.conditionalOn.value) {
+      return String(fieldValue) === field.conditionalOn.value;
+    }
+    
+    return true;
+  };
+
   const handleChange = (fieldId: string, value: string | string[]) => {
     setValues((prev) => ({ ...prev, [fieldId]: value }));
   };
@@ -40,7 +57,7 @@ export default function SurveyForm({ email, name, image }: Props) {
     const section = SURVEY_SECTIONS[currentSection];
     const newErrors: Record<string, string> = {};
     for (const f of section.fields) {
-      if (!f.required) continue;
+      if (!f.required || !isFieldVisible(f)) continue;
       const v = values[f.id];
       if (f.type === "multi_choice") {
         if (!Array.isArray(v) || v.length === 0) newErrors[f.id] = "To pole jest wymagane";

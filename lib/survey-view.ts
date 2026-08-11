@@ -10,11 +10,33 @@ export const PROFILE_VIEW_LABELS: Record<string, string> = {
   needs_members: "Szuka dodatkowych członków zespołu",
   looking_for_roles: "Szukane role w zespole",
   startup_experience: "Doświadczenie startupowe",
+  startup_name: "Nazwa startupu",
+  startup_description: "Opis startupu",
   strengths: "Mocne strony",
   interests: "Zainteresowania",
   personality: "Osobowość / styl pracy",
   preferred_role: "Preferowana rola",
 };
+
+export interface StartupOverview {
+  name: string | null;
+  description: string | null;
+}
+
+export function getStartupOverview(values: FormValues): StartupOverview | null {
+  const name = typeof values.startup_name === "string" ? values.startup_name.trim() : "";
+  const description =
+    typeof values.startup_description === "string" ? values.startup_description.trim() : "";
+
+  if (!name && !description) {
+    return null;
+  }
+
+  return {
+    name: name || null,
+    description: description || null,
+  };
+}
 
 export function formatOptionValue(v: string, otherText?: string): string {
   return v === OTHER_OPTION && otherText ? `\n${OTHER_OPTION}: \n${otherText}` : v;

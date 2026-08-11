@@ -15,7 +15,7 @@ export interface SurveyField {
   numeric?: boolean;
   scaleMin?: string;
   scaleMax?: string;
-  conditionalOn?: { field: string; value: string };
+  conditionalOn?: { field: string; value?: string; values?: string[] };
 }
 
 export interface SurveySection {
@@ -125,6 +125,33 @@ export const SURVEY_SECTIONS: SurveySection[] = [
           "Tak, wstępna koncepcja",
           "Nie, nadal szukam pomysłu",
         ],
+      },
+      {
+        id: "startup_name",
+        label: "Nazwa startupu / projektu",
+        hint: "Jeśli jeszcze nie masz nazwy, możesz wpisać roboczą lub pominąć",
+        type: "short_text",
+        conditionalOn: {
+          field: "has_idea",
+          values: [
+            "Tak, dobrze dopracowany pomysł",
+            "Tak, wstępna koncepcja",
+          ],
+        },
+      },
+      {
+        id: "startup_description",
+        label: "Opisz swój startup, pomysł lub problem, który chcesz rozwiązać",
+        hint: "Czym zajmuje się / będzie zajmować Twój startup? Jaki problem rozwiązuje?",
+        type: "long_text",
+        required: true,
+        conditionalOn: {
+          field: "has_idea",
+          values: [
+            "Tak, dobrze dopracowany pomysł",
+            "Tak, wstępna koncepcja",
+          ],
+        },
       },
       {
         id: "program_path",

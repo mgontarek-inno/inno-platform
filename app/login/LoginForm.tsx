@@ -62,7 +62,7 @@ export default function LoginForm() {
         <p className={styles.note}>
           Logując się, akceptujesz{" "}
           <a
-            href="/polityka-prywatnosci.pdf"
+            href="/polityka_prywatnosci.pdf"
             download
             className={styles.noteLink}
           >

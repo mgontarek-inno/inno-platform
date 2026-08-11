@@ -9,6 +9,7 @@ import {
   OTHER_OPTION,
   PROFILE_VIEW_LABELS,
   formatOptionValue,
+  getStartupOverview,
   sectionHasAnswers,
 } from "@/lib/survey-view";
 import SurveySectionForm from "@/components/SurveySection";
@@ -278,6 +279,7 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
         <div className={styles.list}>
           {filtered.map((profile) => {
             const isExpanded = expandedIds.has(profile.id);
+            const startupOverview = getStartupOverview(profile.values);
             const summaryItems = SUMMARY_FIELDS.map(({ fieldId, label }) => {
               const value = profile.values[fieldId];
               if (!value || (Array.isArray(value) && value.length === 0)) return null;
@@ -348,6 +350,17 @@ export default function ProfilesClient({ profiles, currentEmail, currentUserId }
                       <span className={styles.noEmail}>Brak adresu e‑mail</span>
                     )}
                   </div>
+                </div>
+              )}
+
+              {startupOverview && (
+                <div className={styles.startupOverview}>
+                  {startupOverview.name && (
+                    <h3 className={styles.startupName}>{startupOverview.name}</h3>
+                  )}
+                  {startupOverview.description && (
+                    <p className={styles.startupDescription}>{startupOverview.description}</p>
+                  )}
                 </div>
               )}
 

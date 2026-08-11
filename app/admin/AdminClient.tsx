@@ -8,6 +8,7 @@ import { LINK_FIELD_IDS, safeExternalUrl } from "@/lib/url-safety";
 import {
   PROFILE_VIEW_LABELS,
   formatOptionValue,
+  getStartupOverview,
   sectionHasAnswers,
 } from "@/lib/survey-view";
 import styles from "@/app/profiles/profiles.module.css";
@@ -91,6 +92,8 @@ export default function AdminClient({ users: initialUsers, currentEmail }: Props
     const surveys = users.filter((u) => u.surveyCompleted).length;
     return { total: users.length, pending, approved, surveys };
   }, [users]);
+
+  const startupOverview = preview?.status === "ready" ? getStartupOverview(preview.values) : null;
 
   return (
     <div>
@@ -210,6 +213,16 @@ export default function AdminClient({ users: initialUsers, currentEmail }: Props
                 <p className={styles.dangerZoneError}>
                   Nie udało się wczytać ankiety.
                 </p>
+              )}
+              {preview.status === "ready" && startupOverview && (
+                <div className={styles.startupOverview}>
+                  {startupOverview.name && (
+                    <h3 className={styles.startupName}>{startupOverview.name}</h3>
+                  )}
+                  {startupOverview.description && (
+                    <p className={styles.startupDescription}>{startupOverview.description}</p>
+                  )}
+                </div>
               )}
               {preview.status === "ready" &&
                 (SURVEY_SECTIONS.every(
