@@ -141,7 +141,7 @@ export const SURVEY_SECTIONS: SurveySection[] = [
       },
       {
         id: "startup_description",
-        label: "Opisz swój startup, pomysł lub problem, który chcesz rozwiązać",
+        label: "Opisz swój startup, pomysł lub problem, który chcesz rozwiązać (maks 400 znaków)",
         hint: "Czym zajmuje się / będzie zajmować Twój startup? Jaki problem rozwiązuje?",
         type: "long_text",
         required: true,
