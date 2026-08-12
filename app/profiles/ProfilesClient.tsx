@@ -98,12 +98,29 @@ const EMPTY_FILTERS: FiltersState = {
   needs_members: "",
 };
 
+function isFieldVisible(field: (typeof SURVEY_SECTIONS)[number]["fields"][number], values: FormValues): boolean {
+  if (!field.conditionalOn) return true;
+
+  const fieldValue = values[field.conditionalOn.field];
+  if (fieldValue === undefined || fieldValue === null || fieldValue === "") return false;
+
+  if (field.conditionalOn.values) {
+    return field.conditionalOn.values.includes(String(fieldValue));
+  }
+
+  if (field.conditionalOn.value) {
+    return String(fieldValue) === field.conditionalOn.value;
+  }
+
+  return true;
+}
+
 function validateValues(values: FormValues): Record<string, string> {
   const errors: Record<string, string> = {};
 
   for (const section of SURVEY_SECTIONS) {
     for (const field of section.fields) {
-      if (!field.required) continue;
+      if (!field.required || !isFieldVisible(field, values)) continue;
       const value = values[field.id];
 
       if (field.type === "multi_choice") {

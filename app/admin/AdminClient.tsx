@@ -30,6 +30,7 @@ interface SurveyPreview {
 export default function AdminClient({ users: initialUsers, currentEmail }: Props) {
   const [users, setUsers] = useState(initialUsers);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<SurveyPreview | null>(null);
 
@@ -78,6 +79,31 @@ export default function AdminClient({ users: initialUsers, currentEmail }: Props
       setPreview((prev) =>
         prev ? { ...prev, status: "error" } : prev
       );
+    }
+  };
+
+  const deleteUser = async (email: string) => {
+    if (!window.confirm(`Czy na pewno chcesz usunąć konto ${email}?`)) {
+      return;
+    }
+
+    setError(null);
+    setDeletingEmail(email);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Delete failed");
+
+      setUsers((prev) => prev.filter((u) => u.email !== email));
+    } catch (err) {
+      setError("Błąd przy usuwaniu użytkownika");
+    } finally {
+      setDeletingEmail(null);
     }
   };
 
@@ -186,6 +212,16 @@ export default function AdminClient({ users: initialUsers, currentEmail }: Props
                         onClick={() => updateStatus(u.email, "approved")}
                       >
                         Zatwierdź
+                      </button>
+                    )}
+                    {u.email !== currentEmail && (
+                      <button
+                        type="button"
+                        className={styles.dangerButton}
+                        disabled={deletingEmail === u.email}
+                        onClick={() => deleteUser(u.email)}
+                      >
+                        {deletingEmail === u.email ? "Usuwanie..." : "Usuń konto"}
                       </button>
                     )}
                   </div>

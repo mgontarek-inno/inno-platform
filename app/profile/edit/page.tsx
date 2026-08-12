@@ -50,7 +50,11 @@ export default async function EditProfilePage() {
   const client = await clientPromise;
   const db = client.db(DB_NAME);
 
-  const orConditions: Record<string, unknown>[] = [{ email: session.user.email }];
+  const orConditions: Record<string, unknown>[] = [
+    { email: session.user.email },
+    { userId: session.user.email },
+  ];
+
   if (session.user.googleId) {
     orConditions.push({ userId: session.user.googleId });
   }

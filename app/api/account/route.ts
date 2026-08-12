@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getDbName } from "@/lib/env";
 import clientPromise from "@/lib/mongodb";
-import { getUserByEmail, deleteUserByEmail, setEmailVisible, setProfileVisible } from "@/lib/users";
+import {
+  getUserByEmail,
+  deleteUserByEmail,
+  deleteUserDataByEmail,
+  setEmailVisible,
+  setProfileVisible,
+} from "@/lib/users";
 
 const DB_NAME = getDbName();
 const COLLECTION_NAME = "profiles";
@@ -52,6 +58,7 @@ export async function DELETE() {
 
     const email = session.user.email;
     const currentUser = await getUserByEmail(email);
+    const isAdmin = session.user.role === "admin" || currentUser?.role === "admin";
 
     const client = await clientPromise;
     const db = client.db(DB_NAME);
@@ -59,9 +66,13 @@ export async function DELETE() {
       $or: [{ email }, { userId: currentUser?.googleId ?? email }],
     });
 
-    await deleteUserByEmail(email);
+    if (isAdmin) {
+      await deleteUserDataByEmail(email);
+    } else {
+      await deleteUserByEmail(email);
+    }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true, admin: isAdmin }, { status: 200 });
   } catch (error) {
     console.error("Account deletion failed:", error);
     return NextResponse.json({ error: "Failed to delete account" }, { status: 500 });

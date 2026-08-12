@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin";
-import { listAllUsers, setUserStatus, type UserStatus } from "@/lib/users";
+import {
+  deleteUserDataByEmail,
+  listAllUsers,
+  setUserStatus,
+  type UserStatus,
+} from "@/lib/users";
 
 export async function GET() {
   const session = await requireAdminSession();
@@ -33,5 +38,24 @@ export async function PATCH(request: Request) {
   }
 
   await setUserStatus(body.email, body.status);
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(request: Request) {
+  const session = await requireAdminSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = (await request.json()) as { email?: string };
+  if (!body.email || typeof body.email !== "string") {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  if (body.email === session.user.email) {
+    return NextResponse.json({ error: "Cannot delete your own admin account" }, { status: 400 });
+  }
+
+  await deleteUserDataByEmail(body.email);
   return NextResponse.json({ ok: true });
 }

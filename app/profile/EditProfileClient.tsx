@@ -89,11 +89,28 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
     setDraftValues((p) => ({ ...p, [fieldId]: value }));
   };
 
+  const isFieldVisible = (field: (typeof SURVEY_SECTIONS)[number]["fields"][number], values: FormValues) => {
+    if (!field.conditionalOn) return true;
+
+    const fieldValue = values[field.conditionalOn.field];
+    if (fieldValue === undefined || fieldValue === null || fieldValue === "") return false;
+
+    if (field.conditionalOn.values) {
+      return field.conditionalOn.values.includes(String(fieldValue));
+    }
+
+    if (field.conditionalOn.value) {
+      return String(fieldValue) === field.conditionalOn.value;
+    }
+
+    return true;
+  };
+
   const validateValues = (values: FormValues) => {
     const errs: Record<string, string> = {};
     for (const section of SURVEY_SECTIONS) {
       for (const field of section.fields) {
-        if (!field.required) continue;
+        if (!field.required || !isFieldVisible(field, values)) continue;
         const v = values[field.id];
         if (field.type === "multi_choice") {
           if (!Array.isArray(v) || v.length === 0) errs[field.id] = "To pole jest wymagane";
@@ -133,6 +150,7 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
           onClick={async () => {
             const errs = validateValues(draftValues);
             setErrors(errs);
+            console.log(errs)
             if (Object.keys(errs).length > 0) return;
             setSaving(true);
             try {

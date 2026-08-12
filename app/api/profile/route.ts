@@ -33,10 +33,6 @@ export async function PATCH(request: Request) {
     }
 
     const body = JSON.parse(rawBody) as UpdateProfilePayload;
-    if (!body.profileId || !ObjectId.isValid(body.profileId)) {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-    }
-
     const values = sanitizeSurveyValues(body.values);
     if (Object.keys(values).length === 0) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -45,20 +41,26 @@ export async function PATCH(request: Request) {
     const client = await clientPromise;
     const db = client.db(DB_NAME);
 
-    // allow updating when the current session email matches the profile email
-    // or when the current user's googleId matches profile.userId
-    const ownerMatch = {
-      $or: [
-        { email: session.user.email },
-        ...(session.user.googleId ? [{ userId: session.user.googleId }] : []),
-      ],
-    };
+    const profile =
+      body.profileId && ObjectId.isValid(body.profileId)
+        ? await db.collection(COLLECTION_NAME).findOne({ _id: new ObjectId(body.profileId) })
+        : null;
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    const isOwner =
+      profile.email === session.user.email ||
+      (typeof profile.userId === "string" &&
+        (profile.userId === session.user.email || profile.userId === session.user.googleId));
+
+    if (!isOwner) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const result = await db.collection(COLLECTION_NAME).updateOne(
-      {
-        _id: new ObjectId(body.profileId),
-        ...ownerMatch,
-      },
+      { _id: profile._id },
       {
         $set: {
           values,
@@ -71,7 +73,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true, modified: result.modifiedCount }, { status: 200 });
   } catch (error) {
     console.error("Profile update failed:", error);
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });

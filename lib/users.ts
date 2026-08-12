@@ -79,6 +79,22 @@ export async function deleteUserByEmail(email: string): Promise<void> {
   await db.collection(USERS_COLLECTION).deleteOne({ email });
 }
 
+export async function deleteUserDataByEmail(email: string): Promise<void> {
+  const client = await clientPromise;
+  const db = client.db(getDbName());
+  const user = await db.collection<UserDoc>(USERS_COLLECTION).findOne({ email });
+
+  if (user) {
+    await db.collection("profiles").deleteMany({
+      $or: [{ email }, { userId: user.googleId ?? email }],
+    });
+  } else {
+    await db.collection("profiles").deleteMany({ email });
+  }
+
+  await db.collection(USERS_COLLECTION).deleteOne({ email });
+}
+
 export interface UserSummary {
   email: string;
   name: string;
