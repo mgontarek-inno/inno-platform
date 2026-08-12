@@ -27,6 +27,7 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
   const [hideProfile, setHideProfile] = useState(!profileVisible);
   const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [visibilityError, setVisibilityError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const handleHideEmailChange = async (checked: boolean) => {
     setHideEmail(checked);
@@ -150,7 +151,7 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
           onClick={async () => {
             const errs = validateValues(draftValues);
             setErrors(errs);
-            console.log(errs)
+            setSaveSuccess(null);
             if (Object.keys(errs).length > 0) return;
             setSaving(true);
             try {
@@ -160,7 +161,8 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
                 body: JSON.stringify({ profileId: profile.id, values: draftValues }),
               });
               if (!res.ok) throw new Error('Save failed');
-              router.push('/profiles');
+              setSaveSuccess('Profil został zmieniony.');
+              router.refresh();
             } catch (err) {
               alert('Błąd zapisu profilu');
             } finally {
@@ -172,6 +174,10 @@ export default function EditProfileClient({ profile, emailVisible, profileVisibl
           {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
         </button>
       </div>
+
+      {saveSuccess && (
+        <p style={{ marginTop: 12, color: 'var(--success)', fontWeight: 600 }}>{saveSuccess}</p>
+      )}
 
       <div className={styles.privacyRow}>
         <label className={styles.checkboxLabel}>
